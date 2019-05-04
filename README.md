@@ -1,6 +1,6 @@
 ## Chris de Sousa
 
-Support Engineer, Imposter, Coffee
+Support | Coffee
 
 - [@Xitones](https://twitter.com/Xitones)
 - `git status` [chrisdeso](https://github.com/chrisdeso)
