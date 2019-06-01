@@ -11,4 +11,4 @@ Work
 - EFL Instructor [Past]
 
 Misc
-- Programmatic forum moderation - [link](https://blog.getpostman.com/2018/01/25/we-are-always-watching-the-postman-community-forum/)
+- Programmatic forum moderation using the Discourse API & Postman - [link](https://blog.getpostman.com/2018/01/25/we-are-always-watching-the-postman-community-forum/)
