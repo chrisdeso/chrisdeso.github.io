@@ -1,13 +1,15 @@
 ## Chris de Sousa
 
-Support Engineer, Coffee Enthusiast
 
-- [@Xitones](https://twitter.com/Xitones)
+
 - `git status` [chrisdeso](https://github.com/chrisdeso)
+- [@Xitones](https://twitter.com/Xitones)
 
-Work
+What
 
-- Product Support Manager @ [Postman](https://www.getpostman.com) [Current]
+- Computer Science Student [2023 - present]
+- Dad [2023 - present]
+- Support @ [Postman](https://www.postman.com) [2017 - 2022]
 - EFL Instructor [Past]
 
 Misc
