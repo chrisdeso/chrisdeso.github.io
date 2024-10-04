@@ -1,7 +1,5 @@
 ## Chris de Sousa
 
-
-
 - `git status` [chrisdeso](https://github.com/chrisdeso)
 - [@Xitones](https://twitter.com/Xitones)
 
@@ -13,4 +11,4 @@ What
 - EFL Instructor [Past]
 
 Misc
-- Programmatic forum moderation using the Discourse API & Postman - [link](https://blog.getpostman.com/2018/01/25/we-are-always-watching-the-postman-community-forum/)
+- Crowdsourced forum moderation using the Discourse API & Postman - [link](https://blog.getpostman.com/2018/01/25/we-are-always-watching-the-postman-community-forum/)
