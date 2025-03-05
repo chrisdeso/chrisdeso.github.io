@@ -5,7 +5,7 @@
 
 ### What
 
-- Computer Science Student [2024 - present]
+- Computer Science Student 2024 - present
 - Dad [2023 - present]
 - Support @ [Postman](https://www.postman.com) [2017 - 2022]
 - EFL Instructor [before]
