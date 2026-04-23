@@ -8,6 +8,7 @@ vendor/
 vendor/**/*
 _site/**/*
 Gemfile.lock
+vendor/bundle
 
 # Ruby gem specific
 *.gem
