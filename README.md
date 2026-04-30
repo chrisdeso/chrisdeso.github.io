@@ -6,7 +6,7 @@
 
 - CS Undergrad @ [Texas State University](cs.txst.edu) January 2024 - July 2026
 - Stay at Home Dad [2023 - 2026]
-- Built Support @ [Postman](https://www.postman.com) [2017 - 2022]
+- Support @ [Postman](https://www.postman.com) [2017 - 2022]
 - EFL (English as a Foreign Language) Instructor [before]
 
 #### Projects
