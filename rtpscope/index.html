@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rtpscope — CS 4372 team brief</title>
+<meta name="description" content="Diagnosing whose fault a degraded WebRTC video call is, by correlating network transport signals with independent no-reference pixel quality. CS 4372 project brief.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#12161D; --surface:#171B21; --surface-2:#20252F;
+    --border:rgba(231,234,239,.10);
+    --text:#E7EAEF; --text-2:#98A1AE; --text-3:#5A636F;
+    --cyan:#3FC9DC; --pink:#E566AB;
+    --ok:#5FBF87; --warn:#E0A33E; --bad:#D9544A;
+    --font-display:'Archivo',system-ui,sans-serif;
+    --font-body:'Source Serif 4',Georgia,serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{background:var(--bg);}
+  body{background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased; margin:0;}
+  a{color:var(--cyan);}
+  a:focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}
+  .page{max-width:740px; margin:0 auto; padding:32px 24px 80px;}
+  .print-only{display:none !important;}
+
+  nav.site{display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--text-3); margin-bottom:32px; padding-bottom:16px; border-bottom:1px solid var(--border);}
+  nav.site a{color:var(--text-2); text-decoration:none;}
+  nav.site a:hover{color:var(--cyan);}
+
+  .eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3); display:flex; align-items:center; gap:10px;}
+  .eyebrow .dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;flex:none;}
+  h1.title{font-family:var(--font-display); font-weight:700; font-size:clamp(38px,7vw,58px); line-height:1; letter-spacing:-.01em; margin:14px 0 6px;}
+  .subtitle{font-family:var(--font-mono); font-size:13px; color:var(--text-3); margin-bottom:28px;}
+
+  .tldr{border:1px solid var(--cyan); background:rgba(63,201,220,.07); border-radius:4px; padding:18px 20px; margin-bottom:36px;}
+  .tldr .tag{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-bottom:8px;}
+  .tldr p{margin:0; font-size:15.5px; color:var(--text);}
+
+  .terms{border:1px solid var(--border); border-radius:4px; background:var(--surface); padding:16px 20px; margin-bottom:40px;}
+  .terms .tag{font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-3); font-weight:700; margin-bottom:10px;}
+  .terms dl{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; margin:0;}
+  .terms dt{font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap;}
+  .terms dd{margin:0; font-size:13.5px; color:var(--text-2);}
+
+  section{margin-bottom:42px;}
+  h2{font-family:var(--font-display); font-weight:700; font-size:23px; margin-bottom:12px;}
+  p{margin-bottom:14px; max-width:66ch;}
+  p:last-child{margin-bottom:0;}
+  strong{color:var(--text); font-weight:600;}
+
+  .table-wrap{overflow-x:auto; margin:18px 0; border:1px solid var(--border); border-radius:2px;}
+  table{width:100%; border-collapse:collapse; min-width:520px;}
+  th, td{padding:10px 12px; text-align:left; font-size:13px; border-bottom:1px solid var(--border);}
+  thead th{font-family:var(--font-mono); font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--text-3); background:var(--surface); font-weight:500;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.cause{font-family:var(--font-mono); font-weight:600; color:var(--text);}
+
+  .hud{border:1px solid var(--border); border-radius:4px; background:#0D1015; padding:16px 18px;}
+  .hud-top{font-family:var(--font-mono); font-size:11px; color:var(--text-3); margin-bottom:12px;}
+  .verdict{display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:3px; margin-bottom:12px; border:1px solid var(--border); background:var(--surface);}
+  .verdict .vled{width:9px;height:9px;border-radius:50%;flex:none;}
+  .verdict .vtext{font-family:var(--font-mono); font-weight:700; font-size:13px;}
+  .verdict .vcause{margin-left:auto; font-family:var(--font-mono); font-size:11px; color:var(--text-2);}
+  .verdict .vcause b{color:var(--text);}
+  .bignums{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .bignum{background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:12px 14px;}
+  .bignum .l{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); margin-bottom:4px;}
+  .bignum .v{font-family:var(--font-mono); font-weight:700; font-size:22px;}
+  .bignum.wire .v{color:var(--cyan);}
+  .bignum.pixel .v{color:var(--pink);}
+  canvas.mini-spark{width:100%; height:28px; display:block; margin-top:8px;}
+  .hud-caption{font-size:12.5px; font-style:italic; color:var(--text-3); margin-top:12px;}
+
+  .filmstrip{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+  .film-card{border:1px solid var(--border); border-radius:4px; padding:12px 14px; background:var(--surface);}
+  .film-card .fl{font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); margin-bottom:8px;}
+  .film-card .fv{font-family:var(--font-mono); font-weight:700; font-size:14px; margin-bottom:6px;}
+  .film-card .fc{font-family:var(--font-mono); font-size:11px; color:var(--text-2);}
+  .film-card .fnums{margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--text-3); display:flex; flex-direction:column; gap:2px;}
+
+  .split{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:16px;}
+  .role{border:1px solid var(--border); border-radius:2px; padding:14px; background:var(--surface);}
+  .role .rn{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--cyan); margin-bottom:8px;}
+  .role p{font-size:13px; color:var(--text-2); margin-bottom:0;}
+  .role b{color:var(--text);}
+  .dep-note{font-size:13.5px; color:var(--text-2); font-style:italic; margin-top:14px;}
+
+  .checklist{border:1px solid var(--border); border-radius:4px; background:var(--surface); padding:16px 20px;}
+  .checklist ul{margin:0; padding-left:0; list-style:none;}
+  .checklist li{display:flex; gap:10px; font-size:14px; color:var(--text-2); padding:7px 0; border-bottom:1px dashed var(--border);}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist li .box{font-family:var(--font-mono); color:var(--cyan); flex:none;}
+  .checklist li b{color:var(--text);}
+
+  .ms-row{display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); align-items:baseline;}
+  .ms-row:last-child{border-bottom:none;}
+  .ms-row .mnum{font-family:var(--font-mono); color:var(--cyan); font-size:12px; width:120px; flex:none;}
+  .ms-row .mtext{font-size:14.5px; color:var(--text-2);}
+  .ms-row .mtext b{color:var(--text);}
+
+  .faq{display:flex; flex-direction:column; gap:0;}
+  .qa{padding:16px 0; border-bottom:1px solid var(--border);}
+  .qa:last-child{border-bottom:none;}
+  .qa .q{font-family:var(--font-display); font-weight:600; font-size:15px; margin-bottom:6px; color:var(--text);}
+  .qa .a{font-size:14px; color:var(--text-2); margin:0;}
+
+  footer{margin-top:56px; padding-top:18px; border-top:1px solid var(--border); font-family:var(--font-mono); font-size:11.5px; color:var(--text-3);}
+  footer .full-link{margin-bottom:8px;}
+  footer .full-link a{color:var(--cyan);}
+
+  @media (max-width:600px){
+    .bignums{grid-template-columns:1fr;}
+    .filmstrip{grid-template-columns:1fr;}
+    .split{grid-template-columns:1fr;}
+    .terms dl{grid-template-columns:1fr;}
+  }
+
+  @media print{
+    :root{
+      --bg:#FFFFFF; --surface:#F4F4F2; --surface-2:#ECECE8;
+      --border:#D8D8D4;
+      --text:#141414; --text-2:#4A4A46; --text-3:#75756E;
+      --cyan:#0E6E7A; --pink:#96305A;
+      --ok:#2F6B44; --warn:#8A5A00; --bad:#A32B20;
+    }
+    body{font-size:12.5px;}
+    .page{max-width:100%; padding:0;}
+    a{text-decoration:underline;}
+    .screen-only{display:none !important;}
+    .print-only{display:block !important;}
+    nav.site{display:none;}
+    section{margin-bottom:26px; break-inside:avoid;}
+    .table-wrap, .hud, .filmstrip, .checklist, .split, .qa{break-inside:avoid;}
+    h1.title{font-size:34px;}
+    .tldr{background:#EFF7F8;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="site"><a href="https://chrisdeso.com/">← chrisdeso.com</a><a href="https://chrisdeso.com/paperjam/">compare: paperjam →</a></nav>
+
+  <div class="eyebrow"><span class="dot"></span>CS 4372 · Team Brief</div>
+  <h1 class="title">rtpscope</h1>
+  <div class="subtitle">the short version — read this before the full proposal</div>
+
+  <div class="tldr">
+    <div class="tag">TL;DR</div>
+    <p>rtpscope watches a video call two different ways at once — the raw network packets, and the actual pixels rendered on screen — and cross-references them to figure out <strong>whose fault it is</strong> when a call looks bad: your connection, the other person's, your computer, or their encoder. That's our CS 4372 project. Proposal is due <strong>Sept 21</strong>, a working prototype by <strong>Oct 28</strong>, demo <strong>Nov 23–Dec 7</strong>.</p>
+  </div>
+
+  <div class="terms">
+    <div class="tag">Terms used below</div>
+    <dl>
+      <dt>RTP</dt><dd>the protocol that actually carries a call's live audio/video packets.</dd>
+      <dt>SRTP</dt><dd>RTP, encrypted — what Meet, Jitsi, and Discord actually use.</dd>
+      <dt>Jitter</dt><dd>how unevenly packets are arriving, not how many are lost.</dd>
+      <dt>No-reference metric</dt><dd>a quality score with no access to the original video — we never get the other person's raw camera feed to compare against.</dd>
+      <dt>Wire / Pixel path</dt><dd>our two data sources — the network capture, and the on-screen capture.</dd>
+    </dl>
+  </div>
+
+  <section>
+    <h2>Why this</h2>
+    <p>Every video call app tells you <em>when</em> a call is bad. None of them tell you <em>why</em>. Chrome's own call statistics only see what was handed to the video decoder — not what actually made it onto the screen — so they miss real problems, like your display freezing while the network is completely fine. Watching the network and the screen independently, at the same time, is how you tell those cases apart.</p>
+  </section>
+
+  <section>
+    <h2>How it decides who's at fault</h2>
+    <p>Four situations, each with a different fingerprint across the two signals:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Network says</th><th>Screen says</th><th>Culprit</th></tr></thead>
+        <tbody>
+          <tr><td>loss high, bitrate collapsing</td><td>blocky, freezing</td><td class="cause">Your link</td></tr>
+          <tr><td>loss ~0, bitrate dropped on purpose</td><td>lower res, no freeze</td><td class="cause">The far end</td></tr>
+          <tr><td>loss ~0, bitrate steady</td><td>frozen, decode stalls</td><td class="cause">This machine</td></tr>
+          <tr><td>loss ~0, bitrate steady</td><td>blocky, no freeze</td><td class="cause">Their encoder</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it'll actually look like</h2>
+    <p class="screen-only">A live mock-up, wired to fake data so you can see the idea before any of the real capture code exists — it cycles through the four causes above.</p>
+    <p class="print-only">A mock-up of the on-screen overlay, wired to fake data — three example states are shown below (the live version animates between them; see the link at the end of this page).</p>
+
+    <div class="hud screen-only">
+      <div class="hud-top"><b style="color:var(--text)">meet.google.com</b> · VP9</div>
+      <div class="verdict">
+        <span class="vled" id="vled"></span>
+        <span class="vtext" id="vtext">OK</span>
+        <span class="vcause">CAUSE <b id="vcause">—</b></span>
+      </div>
+      <div class="bignums">
+        <div class="bignum wire"><div class="l">wire · bitrate</div><div class="v" id="wireBig">2.60 Mb/s</div><canvas class="mini-spark" id="wireSpark"></canvas></div>
+        <div class="bignum pixel"><div class="l">pixel · blockiness</div><div class="v" id="pixBig">0.06</div><canvas class="mini-spark" id="pixSpark"></canvas></div>
+      </div>
+      <p class="hud-caption">Fake data, real UI — this is what will be running once the wire and pixel paths are real.</p>
+    </div>
+
+    <div class="filmstrip print-only">
+      <div class="film-card"><div class="fl">State 1</div><div class="fv" style="color:var(--ok);">OK</div><div class="fc">cause —</div><div class="fnums">bitrate 2.60 Mb/s<br>blockiness 0.06</div></div>
+      <div class="film-card"><div class="fl">State 2</div><div class="fv" style="color:var(--bad);">DEGRADED</div><div class="fc">cause: your link</div><div class="fnums">bitrate 0.70 Mb/s<br>blockiness 0.58</div></div>
+      <div class="film-card"><div class="fl">State 3</div><div class="fv" style="color:var(--warn);">DEGRADED</div><div class="fc">cause: this machine</div><div class="fnums">bitrate 2.40 Mb/s (steady)<br>freeze 340 ms</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Who's building what</h2>
+    <div class="split">
+      <div class="role"><div class="rn">Wire path</div><p><b>Task:</b> packet capture + RTP header parser. <b>First goal:</b> print live bitrate/loss/jitter for one call to a terminal.</p></div>
+      <div class="role"><div class="rn">Pixel path</div><p><b>Task:</b> screen capture + no-reference quality scoring. <b>First goal:</b> print a blockiness/freeze number for the same call.</p></div>
+      <div class="role"><div class="rn">Correlation + HUD</div><p><b>Task:</b> merge both series, apply the fault table above, build the overlay. <b>First goal:</b> the fake-data mock-up above, for real.</p></div>
+    </div>
+    <p class="dep-note">Wire and pixel can be built fully in parallel — neither needs the other to exist first. Correlation genuinely can't start for real until both are producing real numbers, so plan on that person prototyping the HUD against fake data (like above) in the meantime, not sitting idle.</p>
+  </section>
+
+  <section>
+    <h2>Get set up</h2>
+    <div class="checklist">
+      <ul>
+        <li><span class="box">[ ]</span><span>A Linux machine (or VM) on <b>GNOME or KDE</b> Wayland — Sway/Hyprland have weaker screen-capture support, avoid for now.</span></li>
+        <li><span class="box">[ ]</span><span>Python 3 + libpcap. One-time: <code>sudo setcap cap_net_raw+ep &lt;binary&gt;</code> — no <code>sudo</code> needed to actually run it after that.</span></li>
+        <li><span class="box">[ ]</span><span>A WebRTC call to test against — <b>Google Meet or Jitsi</b>, not Zoom/Teams (see FAQ).</span></li>
+        <li><span class="box">[ ]</span><span><code>tc netem</code> (ships with <code>iproute2</code> on basically every distro) — we'll use it later to fake network problems on purpose.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Milestones</h2>
+    <div class="ms-row"><div class="mnum">Sept 21</div><div class="mtext"><b>Proposal.</b> Capture stack confirmed working — a raw socket can see the call's UDP flow at all.</div></div>
+    <div class="ms-row"><div class="mnum">Oct 28</div><div class="mtext"><b>Progress.</b> Wire path reports live bitrate/loss/jitter to a terminal. No UI, no pixels yet.</div></div>
+    <div class="ms-row"><div class="mnum">Nov 23–Dec 7</div><div class="mtext"><b>Final.</b> Pixel path + attribution + HUD + report, validated against <code>netem</code> tests with a known answer key.</div></div>
+  </section>
+
+  <section>
+    <h2>Questions you probably have</h2>
+    <div class="faq">
+      <div class="qa"><div class="q">Why not just test on Zoom or Teams?</div><p class="a">They hide their packet framing beyond plain SRTP, so we can't read bitrate/loss/jitter off the wire the same way. Meet and Jitsi are both plain WebRTC — that's why we're scoping to those.</p></div>
+      <div class="qa"><div class="q">Do we need root to run this?</div><p class="a">Only once, to grant the capture binary permission via <code>setcap</code>. After that it runs as a normal user, every time.</p></div>
+      <div class="qa"><div class="q">Is it okay to capture our own call's packets?</div><p class="a">Yes — we only ever read headers (metadata) off our own machine's own network interface, for our own call. We never decrypt anyone's actual audio or video.</p></div>
+      <div class="qa"><div class="q">What if screen capture doesn't work on someone's laptop?</div><p class="a">GNOME/KDE Wayland is the reliable path; keep an X11 session as a fallback if your setup is something else.</p></div>
+      <div class="qa"><div class="q">What do we actually turn in at the end?</div><p class="a">Two things: a CSV + written report generator (the real deliverable) and the live overlay HUD (the demo surface) — both shown above.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="full-link screen-only">Full proposal — protocol details, validated research, risk analysis: <a href="https://claude.ai/code/artifact/acad6fbb-85c6-4196-85a8-8872bfe7b76f">claude.ai/code/artifact/acad6fbb…</a></div>
+    <div class="full-link print-only">Full proposal: https://claude.ai/code/artifact/acad6fbb-85c6-4196-85a8-8872bfe7b76f</div>
+    <span>rtpscope · CS 4372 · Fall 2026</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var vtext = document.getElementById('vtext');
+  if(!vtext) return;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var scenarios = [
+    { verdict:'OK', color:'#5FBF87', cause:'—', wireTarget:2.6, pixTarget:0.06 },
+    { verdict:'DEGRADED', color:'#D9544A', cause:'Your link', wireTarget:0.7, pixTarget:0.58 },
+    { verdict:'DEGRADED', color:'#E0A33E', cause:'This machine', wireTarget:2.4, pixTarget:0.10 },
+    { verdict:'DEGRADED', color:'#E566AB', cause:'Their encoder', wireTarget:2.5, pixTarget:0.55 }
+  ];
+  var N = 24;
+  var wireHist = [], pixHist = [];
+  var wireVal = 2.6, pixVal = 0.06;
+  var idx = 0, ticksInScenario = 0, ticksPerScenario = 16;
+
+  var wireCanvas = document.getElementById('wireSpark');
+  var pixCanvas = document.getElementById('pixSpark');
+
+  function fitCanvas(c){
+    var dpr = window.devicePixelRatio || 1;
+    var w = c.clientWidth || 200, h = 28;
+    c.width = w * dpr; c.height = h * dpr;
+    var ctx = c.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return ctx;
+  }
+
+  function drawSpark(canvas, data, color, max){
+    if(!canvas) return;
+    var ctx = fitCanvas(canvas);
+    var w = canvas.clientWidth || 200, h = 28;
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle = 'rgba(231,234,239,.10)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,h-4); ctx.lineTo(w,h-4); ctx.stroke();
+    if(data.length < 2) return;
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.6; ctx.lineJoin = 'round';
+    for(var k=0;k<data.length;k++){
+      var x = (k/(N-1)) * w;
+      var y = h - 3 - (Math.min(data[k],max)/max) * (h-7);
+      if(k===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    var lx = ((data.length-1)/(N-1)) * w;
+    var ly = h - 3 - (Math.min(data[data.length-1],max)/max) * (h-7);
+    ctx.beginPath(); ctx.fillStyle = color; ctx.arc(lx,ly,2.2,0,Math.PI*2); ctx.fill();
+  }
+
+  function step(){
+    var s = scenarios[idx];
+    wireVal += (s.wireTarget - wireVal) * 0.35 + (Math.random()-0.5)*0.08;
+    pixVal += (s.pixTarget - pixVal) * 0.35 + (Math.random()-0.5)*0.015;
+    wireVal = Math.max(0.05, wireVal);
+    pixVal = Math.max(0.02, Math.min(0.95, pixVal));
+
+    wireHist.push(wireVal); if(wireHist.length > N) wireHist.shift();
+    pixHist.push(pixVal); if(pixHist.length > N) pixHist.shift();
+
+    vtext.textContent = s.verdict; vtext.style.color = s.color;
+    var vled = document.getElementById('vled');
+    vled.style.background = s.color; vled.style.boxShadow = '0 0 8px ' + s.color;
+    document.getElementById('vcause').textContent = s.cause;
+    document.getElementById('wireBig').textContent = wireVal.toFixed(2) + ' Mb/s';
+    document.getElementById('pixBig').textContent = pixVal.toFixed(2);
+
+    drawSpark(wireCanvas, wireHist, '#3FC9DC', 3.2);
+    drawSpark(pixCanvas, pixHist, '#E566AB', 1.0);
+
+    ticksInScenario++;
+    if(ticksInScenario >= ticksPerScenario){ ticksInScenario = 0; idx = (idx+1) % scenarios.length; }
+  }
+
+  step();
+  if(!reduced){ setInterval(step, 400); }
+  window.addEventListener('resize', function(){
+    drawSpark(wireCanvas, wireHist, '#3FC9DC', 3.2);
+    drawSpark(pixCanvas, pixHist, '#E566AB', 1.0);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>paperjam — CS 4372 team brief</title>
+<meta name="description" content="Building a playable two-player Pong on real e-ink hardware by scheduling refresh waveform per region instead of globally. CS 4372 project brief.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,400&family=Literata:ital,opsz,wght@0,16..30,400;0,16..30,500;0,16..30,600;1,16..30,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#EAE8E1; --surface:#E1DED2; --surface-2:#D6D2C3;
+    --text:#1C1B17; --text-2:#4B4A43; --text-3:#7D7B70; --text-4:#ADAB9E;
+    --line:rgba(28,27,23,.16);
+    --accent:#B8362A; --accent-soft:rgba(184,54,42,.12);
+    --ok:#3F6B4A; --warn:#8A6A22;
+    --font-display:'Fraunces',Georgia,serif;
+    --font-body:'Literata',Georgia,serif;
+    --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{background:var(--bg);}
+  body{background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased; margin:0;}
+  a{color:var(--accent);}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .page{max-width:740px; margin:0 auto; padding:32px 24px 80px;}
+  .print-only{display:none !important;}
+
+  nav.site{display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--text-3); margin-bottom:32px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+  nav.site a{color:var(--text-2); text-decoration:none;}
+  nav.site a:hover{color:var(--accent);}
+
+  .eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3); display:flex; align-items:center; gap:10px;}
+  .eyebrow .dot{width:5px;height:5px;background:var(--accent);border-radius:50%;flex:none;}
+  h1.title{font-family:var(--font-display); font-weight:600; font-size:clamp(38px,7vw,58px); line-height:1; letter-spacing:-.01em; margin:14px 0 6px;}
+  .subtitle{font-family:var(--font-mono); font-size:13px; color:var(--text-3); margin-bottom:28px;}
+
+  .tldr{border:1px solid var(--accent); background:var(--accent-soft); border-radius:4px; padding:18px 20px; margin-bottom:36px;}
+  .tldr .tag{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:8px;}
+  .tldr p{margin:0; font-size:15.5px; color:var(--text);}
+
+  .terms{border:1px solid var(--line); border-radius:4px; background:var(--surface); padding:16px 20px; margin-bottom:40px;}
+  .terms .tag{font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-3); font-weight:700; margin-bottom:10px;}
+  .terms dl{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; margin:0;}
+  .terms dt{font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap;}
+  .terms dd{margin:0; font-size:13.5px; color:var(--text-2);}
+
+  section{margin-bottom:42px;}
+  h2{font-family:var(--font-display); font-weight:600; font-size:23px; margin-bottom:12px;}
+  p{margin-bottom:14px; max-width:66ch;}
+  p:last-child{margin-bottom:0;}
+  strong{color:var(--text); font-weight:600;}
+
+  .table-wrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:2px;}
+  table{width:100%; border-collapse:collapse; min-width:520px;}
+  th, td{padding:10px 12px; text-align:left; font-size:13px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums;}
+  thead th{font-family:var(--font-mono); font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--text-3); background:var(--surface); font-weight:500;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.mode{font-family:var(--font-mono); font-weight:600; color:var(--text);}
+  td.ghost-none{color:var(--ok);}
+  td.ghost-some{color:var(--warn);}
+  td.ghost-fast{color:var(--accent); font-weight:500;}
+
+  .demo{border:1px solid var(--line); border-radius:4px; background:var(--surface); padding:16px 18px;}
+  .demo canvas{width:100%; height:auto; aspect-ratio:16/9; display:block; background:#fff; border:1px solid var(--line);}
+  .demo-stats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; margin-top:12px; border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .demo-stats div{padding:10px 12px; border-right:1px solid var(--line); text-align:center;}
+  .demo-stats div:last-child{border-right:none;}
+  .demo-stats .sv{font-family:var(--font-mono); font-weight:700; font-size:18px; font-variant-numeric:tabular-nums;}
+  .demo-stats .sl{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); margin-top:3px;}
+  .hud-caption{font-size:12.5px; font-style:italic; color:var(--text-3); margin-top:12px;}
+
+  .filmstrip{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+  .film-card{border:1px solid var(--line); border-radius:4px; padding:12px 14px; background:var(--surface);}
+  .film-card .fl{font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); margin-bottom:8px;}
+  .film-card .fv{font-family:var(--font-mono); font-weight:700; font-size:14px; margin-bottom:6px;}
+
+  .split{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:16px;}
+  .role{border:1px solid var(--line); border-radius:2px; padding:14px; background:var(--surface);}
+  .role .rn{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:8px;}
+  .role p{font-size:13px; color:var(--text-2); margin-bottom:0;}
+  .role b{color:var(--text);}
+  .dep-note{font-size:13.5px; color:var(--text-2); font-style:italic; margin-top:14px;}
+
+  .checklist{border:1px solid var(--line); border-radius:4px; background:var(--surface); padding:16px 20px;}
+  .checklist ul{margin:0; padding-left:0; list-style:none;}
+  .checklist li{display:flex; gap:10px; font-size:14px; color:var(--text-2); padding:7px 0; border-bottom:1px dashed var(--line);}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist li .box{font-family:var(--font-mono); color:var(--accent); flex:none;}
+  .checklist li b{color:var(--text);}
+
+  .ms-row{display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); align-items:baseline;}
+  .ms-row:last-child{border-bottom:none;}
+  .ms-row .mnum{font-family:var(--font-mono); color:var(--accent); font-size:12px; width:120px; flex:none;}
+  .ms-row .mtext{font-size:14.5px; color:var(--text-2);}
+  .ms-row .mtext b{color:var(--text);}
+
+  .faq{display:flex; flex-direction:column; gap:0;}
+  .qa{padding:16px 0; border-bottom:1px solid var(--line);}
+  .qa:last-child{border-bottom:none;}
+  .qa .q{font-family:var(--font-display); font-weight:600; font-size:15px; margin-bottom:6px; color:var(--text);}
+  .qa .a{font-size:14px; color:var(--text-2); margin:0;}
+
+  footer{margin-top:56px; padding-top:18px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11.5px; color:var(--text-3);}
+  footer .full-link{margin-bottom:8px;}
+  footer .full-link a{color:var(--accent);}
+
+  @media (max-width:600px){
+    .filmstrip{grid-template-columns:1fr;}
+    .split{grid-template-columns:1fr;}
+    .terms dl{grid-template-columns:1fr;}
+    .demo-stats{grid-template-columns:1fr;}
+    .demo-stats div{border-right:none; border-bottom:1px solid var(--line);}
+    .demo-stats div:last-child{border-bottom:none;}
+  }
+
+  @media print{
+    :root{
+      --bg:#FFFFFF; --surface:#F4F4F2; --line:#D8D8D4;
+      --text:#141414; --text-2:#4A4A46; --text-3:#75756E;
+      --accent:#96305A; --ok:#2F6B44; --warn:#8A5A00;
+    }
+    body{font-size:12.5px;}
+    .page{max-width:100%; padding:0;}
+    a{text-decoration:underline;}
+    .screen-only{display:none !important;}
+    .print-only{display:block !important;}
+    nav.site{display:none;}
+    section{margin-bottom:26px; break-inside:avoid;}
+    .table-wrap, .demo, .filmstrip, .checklist, .split, .qa{break-inside:avoid;}
+    h1.title{font-size:34px;}
+    .tldr{background:#FBEFED;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="site"><a href="https://chrisdeso.com/">← chrisdeso.com</a><a href="https://chrisdeso.com/rtpscope/">compare: rtpscope →</a></nav>
+
+  <div class="eyebrow"><span class="dot"></span>CS 4372 · Team Brief</div>
+  <h1 class="title">paperjam</h1>
+  <div class="subtitle">the short version — read this before the full proposal</div>
+
+  <div class="tldr">
+    <div class="tag">TL;DR</div>
+    <p>paperjam turns a real e-ink display into a <strong>playable two-player Pong game</strong> by treating its refresh mode as a per-region scheduling problem instead of one fixed global setting — the scoreboard stays crisp while the ball updates fast enough to actually play. Alternative CS 4372 project idea (see the compare link above for rtpscope). Same dates: proposal <strong>Sept 21</strong>, prototype <strong>Oct 28</strong>, demo <strong>Nov 23–Dec 7</strong>.</p>
+  </div>
+
+  <div class="terms">
+    <div class="tag">Terms used below</div>
+    <dl>
+      <dt>Waveform</dt><dd>the drive sequence that moves an e-ink pixel from one shade to another — different waveforms trade speed for quality.</dd>
+      <dt>Ghosting</dt><dd>a faint trace of the previous image left behind after a fast refresh.</dd>
+      <dt>GC16 / A2 / etc.</dt><dd>preset waveform modes built into our display's controller chip (see table below).</dd>
+      <dt>IT8951</dt><dd>the chip that actually drives the panel and exposes those modes over SPI.</dd>
+      <dt>Partial refresh</dt><dd>updating just one region of the screen, independent of the rest.</dd>
+    </dl>
+  </div>
+
+  <section>
+    <h2>Why this</h2>
+    <p>E-ink is the display defined by what it can't do: motion. Every e-ink device ships with one fixed refresh policy for the whole panel — fine for reading, useless the moment a screen needs a crisp scoreboard and a fast-moving ball at the same time. Nobody has shipped something you can actually play, by feel, on e-ink. We think that's a software policy limit, not a hardware one, and we're going to prove it with a paddle.</p>
+  </section>
+
+  <section>
+    <h2>How it picks a mode</h2>
+    <p>Six built-in waveforms, each a different speed/quality tradeoff — assigned per region instead of to the whole screen:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mode</th><th>Gray levels</th><th>Refresh</th><th>Ghosting</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td class="mode">INIT</td><td>2 (flash)</td><td>≈2000 ms</td><td class="ghost-none">clears all</td><td>splash screen</td></tr>
+          <tr><td class="mode">GC16</td><td>16</td><td>≈450 ms</td><td class="ghost-none">none</td><td>"GAME OVER"</td></tr>
+          <tr><td class="mode">GL16</td><td>16</td><td>≈450 ms</td><td class="ghost-some">medium</td><td>the scoreboard</td></tr>
+          <tr><td class="mode">DU4</td><td>4</td><td>≈290 ms</td><td class="ghost-some">accumulates</td><td>the paddles</td></tr>
+          <tr><td class="mode">DU</td><td>2 (B/W)</td><td>≈260 ms</td><td class="ghost-some">accumulates</td><td>serve countdown</td></tr>
+          <tr><td class="mode">A2</td><td>2 (B/W)</td><td>≈120 ms</td><td class="ghost-fast">accumulates fast</td><td>the ball</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it'll actually look like</h2>
+    <p class="screen-only">A running simulation of the actual render logic, auto-playing — not a screenshot. The scoreboard resets to true white every frame; the ball never gets a clean background under it, so it visibly trails and ghosts, same as it will on the real panel.</p>
+    <p class="print-only">A mock-up of the render logic — three example states from the live simulation are shown below (see the link at the end of this page for the running version).</p>
+
+    <div class="demo screen-only">
+      <canvas id="pongCanvas"></canvas>
+      <div class="demo-stats">
+        <div><div class="sv" id="pjScore">0 – 0</div><div class="sl">score · GL16</div></div>
+        <div><div class="sv" id="pjRally">0</div><div class="sl">rally · DU4 paddles</div></div>
+        <div><div class="sv" id="pjDebt">0%</div><div class="sl">ghost debt · A2 ball</div></div>
+      </div>
+      <p class="hud-caption">Auto-playing, no controller needed — AI vs AI so it's legible without input.</p>
+    </div>
+
+    <div class="filmstrip print-only">
+      <div class="film-card"><div class="fl">Scoreboard</div><div class="fv" style="color:var(--ok);">GL16</div>reset every frame, never ghosts</div>
+      <div class="film-card"><div class="fl">Paddles</div><div class="fv" style="color:var(--warn);">DU4</div>background reset each frame, minimal ghosting</div>
+      <div class="film-card"><div class="fl">Ball</div><div class="fv" style="color:var(--accent);">A2</div>no background reset — this is what ghosts</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Who's building what</h2>
+    <div class="split">
+      <div class="role"><div class="rn">Game + input</div><p><b>Task:</b> game loop, ball physics, GPIO button wiring. <b>First goal:</b> one square moving in A2 mode from our own code.</p></div>
+      <div class="role"><div class="rn">Driver + hacking</div><p><b>Task:</b> IT8951 SPI integration, partial-window addressing. <b>First goal:</b> one full-panel GC16 image, one A2 region update.</p></div>
+      <div class="role"><div class="rn">Scheduler + eval</div><p><b>Task:</b> ghost-debt model, mode assignment, baselines. <b>First goal:</b> the demo above, driven by real data.</p></div>
+    </div>
+    <p class="dep-note">Game+input and driver work can start fully in parallel. Scheduler work needs both of those producing real frames before it can be evaluated for real — plan on that person prototyping the ghost-debt logic against the fake-data demo above in the meantime.</p>
+  </section>
+
+  <section>
+    <h2>Get set up</h2>
+    <div class="checklist">
+      <ul>
+        <li><span class="box">[ ]</span><span>Order the <b>Waveshare 6″ HD e-Paper (IT8951)</b> + Raspberry Pi today — ~$130, about a week to ship, and it's on the critical path for Milestone 1.</span></li>
+        <li><span class="box">[ ]</span><span>4 momentary arcade buttons + jumper wires for GPIO (two-player input, not a shared keyboard).</span></li>
+        <li><span class="box">[ ]</span><span>Python 3 + a community IT8951 driver — <code>GregDMeyer/IT8951</code> on GitHub is the best-tested one.</span></li>
+        <li><span class="box">[ ]</span><span>Save a copy of E Ink's AF-waveform timing spec (linked in the full proposal) so we're citing real numbers, not guesses.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Milestones</h2>
+    <div class="ms-row"><div class="mnum">Sept 21</div><div class="mtext"><b>Proposal.</b> Hardware on order. One full-panel GC16 splash and one A2 square moving, from our own code.</div></div>
+    <div class="ms-row"><div class="mnum">Oct 28</div><div class="mtext"><b>Progress.</b> Pong is playable, badly — one fixed waveform, real buttons wired, scoreboard smears.</div></div>
+    <div class="ms-row"><div class="mnum">Nov 23–Dec 7</div><div class="mtext"><b>Final.</b> Adaptive per-region scheduling, measured against both fixed baselines, live two-player demo.</div></div>
+  </section>
+
+  <section>
+    <h2>Questions you probably have</h2>
+    <div class="faq">
+      <div class="qa"><div class="q">Why not just use a cheap $20 panel?</div><p class="a">Those are 1-bit only (no IT8951, no GC16/DU4/A2 modes) — there'd be exactly one waveform to "adaptively" choose between, which deletes the whole point.</p></div>
+      <div class="qa"><div class="q">Do we need to write actual firmware?</div><p class="a">No — the six built-in waveform modes are enough for the real project. Writing a custom waveform table is an optional stretch goal we've already flagged as likely infeasible on this specific chip (see full proposal).</p></div>
+      <div class="qa"><div class="q">What if partial-window updates don't work on our panel?</div><p class="a">Fallback is choosing one waveform for the entire next frame instead of per-region — weaker, but still a real version of the same question, and it still beats a fixed baseline if the classifier is any good.</p></div>
+      <div class="qa"><div class="q">Is Pong actually going to feel playable at these refresh speeds?</div><p class="a">That's an open, honest risk — even A2's ~120 ms is slower than a real Pong "wants" to feel. We decouple the physics tick from the panel's refresh rate to compensate; whether that's enough is part of what Milestone 2 tells us.</p></div>
+      <div class="qa"><div class="q">What do we actually turn in at the end?</div><p class="a">A playable two-player Pong cabinet on real hardware, plus a measured comparison against two fixed-waveform baselines — both described above.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="full-link">Full proposal — waveform research, prior art, risk analysis: <a href="https://claude.ai/code/artifact/9fd08e25-f3a4-4442-a0c8-8c67c7360178">claude.ai/code/artifact/9fd08e25…</a></div>
+    <span>paperjam · CS 4372 · Fall 2026</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var canvas = document.getElementById('pongCanvas');
+  if(!canvas) return;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ctx = canvas.getContext('2d');
+  var W = 320, H = 180;
+  var dpr = window.devicePixelRatio || 1;
+
+  function resize(){ canvas.width = W*dpr; canvas.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  resize();
+  window.addEventListener('resize', resize);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+
+  var ball = { x:W/2, y:H/2, vx:1.6, vy:1.1, r:3.5 };
+  var p1 = { y:H/2, h:26, w:4, x:14 };
+  var p2 = { y:H/2, h:26, w:4, x:W-18 };
+  var score1 = 0, score2 = 0, rally = 0, debt = 0;
+
+  function aiFollow(p, targetY){
+    var dy = targetY - p.y, speed = 1.5;
+    if(Math.abs(dy) > speed) p.y += (dy > 0 ? speed : -speed);
+    p.y = Math.max(p.h/2+4, Math.min(H-p.h/2-4, p.y));
+  }
+  function resetBall(dir){
+    ball.x = W/2; ball.y = H/2 + (Math.random()*40-20);
+    ball.vx = 1.6 * dir; ball.vy = (Math.random()*2-1) * 1.2;
+    rally = 0; document.getElementById('pjRally').textContent = rally;
+  }
+
+  function tick(){
+    ball.x += ball.vx; ball.y += ball.vy;
+    if(ball.y < 4 || ball.y > H-4) ball.vy *= -1;
+    aiFollow(p1, ball.y); aiFollow(p2, ball.y);
+
+    if(ball.vx < 0 && ball.x - ball.r < p1.x + p1.w/2 && ball.x > p1.x - 10 && Math.abs(ball.y-p1.y) < p1.h/2+2){
+      ball.vx *= -1.04; ball.x = p1.x + p1.w/2 + ball.r; rally++;
+      document.getElementById('pjRally').textContent = rally;
+    }
+    if(ball.vx > 0 && ball.x + ball.r > p2.x - p2.w/2 && ball.x < p2.x + 10 && Math.abs(ball.y-p2.y) < p2.h/2+2){
+      ball.vx *= -1.04; ball.x = p2.x - p2.w/2 - ball.r; rally++;
+      document.getElementById('pjRally').textContent = rally;
+    }
+    if(ball.x < 0){ score2++; resetBall(1); document.getElementById('pjScore').textContent = score1+' – '+score2; }
+    if(ball.x > W){ score1++; resetBall(-1); document.getElementById('pjScore').textContent = score1+' – '+score2; }
+
+    debt = Math.min(100, debt + Math.abs(ball.vx)*0.9);
+    var forcedFlush = debt >= 100;
+    if(forcedFlush) debt = 0;
+    document.getElementById('pjDebt').textContent = Math.round(debt) + '%';
+
+    ctx.fillStyle = forcedFlush ? '#fff' : 'rgba(255,255,255,0.16)';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = '#ccc'; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#fff'; ctx.fillRect(W/2-40, 4, 80, 16);
+    ctx.fillStyle = '#111'; ctx.font = '12px "JetBrains Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText(score1 + '   ' + score2, W/2, 15);
+
+    ctx.fillStyle = '#fff'; ctx.fillRect(p1.x-6, 0, 16, H);
+    ctx.fillStyle = '#fff'; ctx.fillRect(p2.x-10, 0, 16, H);
+    ctx.fillStyle = '#111';
+    ctx.fillRect(p1.x-p1.w/2, p1.y-p1.h/2, p1.w, p1.h);
+    ctx.fillRect(p2.x-p2.w/2, p2.y-p2.h/2, p2.w, p2.h);
+
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = '#999'; ctx.font = '7px "JetBrains Mono", monospace'; ctx.textAlign = 'left';
+    ctx.fillText('GL16', W/2-38, 22);
+    ctx.fillText('DU4', p1.x-4, H-4);
+    ctx.fillText('A2', ball.x+6, ball.y-6);
+  }
+
+  tick();
+  if(!reduced){ setInterval(tick, 33); }
+})();
+</script>
+</body>
+</html>
