@@ -151,6 +151,7 @@
     <dl>
       <dt>Waveform</dt><dd>the drive sequence that moves an e-ink pixel from one shade to another — different waveforms trade speed for quality.</dd>
       <dt>Ghosting</dt><dd>a faint trace of the previous image left behind after a fast refresh.</dd>
+      <dt>SSIM</dt><dd>Structural Similarity Index — the standard image-quality metric from the course's compression unit, 0–1, comparing a frame to a clean reference. We use it to score ghosting: 1.0 = identical, lower = more visible ghosting.</dd>
       <dt>GC16 / A2 / etc.</dt><dd>preset waveform modes built into our display's controller chip (see table below).</dd>
       <dt>IT8951</dt><dd>the chip that actually drives the panel and exposes those modes over SPI.</dd>
       <dt>Partial refresh</dt><dd>updating just one region of the screen, independent of the rest.</dd>
@@ -190,7 +191,7 @@
       <div class="demo-stats">
         <div><div class="sv" id="pjScore">0 – 0</div><div class="sl">score · GL16</div></div>
         <div><div class="sv" id="pjRally">0</div><div class="sl">rally · DU4 paddles</div></div>
-        <div><div class="sv" id="pjDebt">0%</div><div class="sl">ghost debt · A2 ball</div></div>
+        <div><div class="sv" id="pjSSIM">0.98</div><div class="sl">SSIM · A2 ball</div></div>
       </div>
       <p class="hud-caption">Auto-playing, no controller needed — AI vs AI so it's legible without input.</p>
     </div>
@@ -207,9 +208,9 @@
     <div class="split">
       <div class="role"><div class="rn">Game + input</div><p><b>Task:</b> game loop, ball physics, GPIO button wiring. <b>First goal:</b> one square moving in A2 mode from our own code.</p></div>
       <div class="role"><div class="rn">Driver + hacking</div><p><b>Task:</b> IT8951 SPI integration, partial-window addressing. <b>First goal:</b> one full-panel GC16 image, one A2 region update.</p></div>
-      <div class="role"><div class="rn">Scheduler + eval</div><p><b>Task:</b> ghost-debt model, mode assignment, baselines. <b>First goal:</b> the demo above, driven by real data.</p></div>
+      <div class="role"><div class="rn">Scheduler + eval</div><p><b>Task:</b> SSIM-threshold model, mode assignment, baselines. <b>First goal:</b> the demo above, driven by real data.</p></div>
     </div>
-    <p class="dep-note">Game+input and driver work can start fully in parallel. Scheduler work needs both of those producing real frames before it can be evaluated for real — plan on that person prototyping the ghost-debt logic against the fake-data demo above in the meantime.</p>
+    <p class="dep-note">Game+input and driver work can start fully in parallel. Scheduler work needs both of those producing real frames before it can be evaluated for real — plan on that person prototyping the SSIM-threshold logic against the fake-data demo above in the meantime.</p>
   </section>
 
   <section>
@@ -266,7 +267,7 @@
   var ball = { x:W/2, y:H/2, vx:1.6, vy:1.1, r:3.5 };
   var p1 = { y:H/2, h:26, w:4, x:14 };
   var p2 = { y:H/2, h:26, w:4, x:W-18 };
-  var score1 = 0, score2 = 0, rally = 0, debt = 0;
+  var score1 = 0, score2 = 0, rally = 0, ssim = 0.98;
 
   function aiFollow(p, targetY){
     var dy = targetY - p.y, speed = 1.5;
@@ -295,10 +296,10 @@
     if(ball.x < 0){ score2++; resetBall(1); document.getElementById('pjScore').textContent = score1+' – '+score2; }
     if(ball.x > W){ score1++; resetBall(-1); document.getElementById('pjScore').textContent = score1+' – '+score2; }
 
-    debt = Math.min(100, debt + Math.abs(ball.vx)*0.9);
-    var forcedFlush = debt >= 100;
-    if(forcedFlush) debt = 0;
-    document.getElementById('pjDebt').textContent = Math.round(debt) + '%';
+    ssim = Math.max(0.12, ssim - Math.abs(ball.vx)*0.009);
+    var forcedFlush = ssim <= 0.35;
+    if(forcedFlush) ssim = 0.97 + Math.random()*0.02;
+    document.getElementById('pjSSIM').textContent = ssim.toFixed(2);
 
     ctx.fillStyle = forcedFlush ? '#fff' : 'rgba(255,255,255,0.16)';
     ctx.fillRect(0, 0, W, H);
