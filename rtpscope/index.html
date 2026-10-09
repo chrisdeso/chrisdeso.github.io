@@ -186,6 +186,85 @@ details.qa .qa-body p{padding-top:12px; margin:0;}
   .term-grid{grid-template-columns:1fr;}
   dl.terms{grid-template-columns:1fr;}
 }
+
+/* --- UI mock-ups (static) --- */
+.mk{
+  --mk-bg:#0d1117; --mk-panel:#161b22; --mk-tile:#1f2630; --mk-line:#30363d;
+  --mk-text:#e6edf3; --mk-text-2:#9198a1; --mk-text-3:#6e7681;
+  --mk-acc:#4fc3d9; --mk-ok:#4cc38a; --mk-warn:#e0a33e; --mk-bad:#e5534b; --mk-pink:#e07be0;
+  --mk-mono:ui-monospace,"SFMono-Regular","SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --mk-sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;
+  margin:0 0 8px;
+}
+.mk-win{border:1px solid var(--mk-line); border-radius:8px; overflow:hidden; background:var(--mk-bg); color:var(--mk-text); font-family:var(--mk-sans); font-size:13px; line-height:1.4; break-inside:avoid;}
+.mk-bar{display:flex; align-items:center; gap:7px; padding:8px 12px; background:var(--mk-panel); border-bottom:1px solid var(--mk-line);}
+.mk-bar i{width:10px; height:10px; border-radius:50%; background:var(--mk-line); flex:none;}
+.mk-url{margin-left:8px; font-family:var(--mk-mono); font-size:11.5px; color:var(--mk-text-2); background:var(--mk-bg); border:1px solid var(--mk-line); border-radius:4px; padding:2px 10px; flex:1; max-width:340px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+.mk-cap{font-size:13px; color:var(--text-2); font-style:italic; margin:8px 0 26px; max-width:70ch;}
+.mk-label{font-family:var(--mk-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-3); margin:0 0 8px;}
+
+/* video tiles */
+.mk-tile{position:relative; background:var(--mk-tile); border-radius:6px; overflow:hidden; aspect-ratio:16/9;}
+.mk-person{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:34%; height:78%;}
+.mk-person::before{content:""; position:absolute; left:50%; top:4%; transform:translateX(-50%); width:44%; aspect-ratio:1; border-radius:50%; background:#3a4452;}
+.mk-person::after{content:""; position:absolute; left:0; right:0; bottom:0; height:46%; border-radius:48% 48% 0 0; background:#3a4452;}
+.mk-name{position:absolute; left:8px; bottom:8px; font-size:11.5px; font-weight:600; background:rgba(0,0,0,.55); color:#fff; padding:2px 8px; border-radius:4px;}
+.mk-badge{position:absolute; right:8px; top:8px; font-family:var(--mk-mono); font-size:10.5px; background:rgba(0,0,0,.55); color:#fff; padding:2px 7px; border-radius:4px;}
+.mk-badge.warn{color:var(--mk-warn);}
+.mk-pip{position:absolute; right:10px; bottom:10px; width:26%; border:2px solid var(--mk-bg); box-shadow:0 2px 8px rgba(0,0,0,.4);}
+
+/* join screen */
+.mk-join{display:grid; grid-template-columns:1.1fr 1fr; gap:18px; padding:18px;}
+.mk-meter{display:flex; align-items:center; gap:8px; margin-top:8px; font-size:11px; color:var(--mk-text-2);}
+.mk-meter span{flex:1; height:5px; border-radius:3px; background:linear-gradient(90deg,var(--mk-ok) 0 38%, var(--mk-line) 38% 100%);}
+.mk-form{display:flex; flex-direction:column; gap:10px;}
+.mk-form h4{margin:0 0 2px; font-size:16px; font-weight:600;}
+.mk-field label{display:block; font-size:11px; color:var(--mk-text-2); margin-bottom:3px;}
+.mk-input{border:1px solid var(--mk-line); background:var(--mk-panel); border-radius:5px; padding:6px 9px; font-family:var(--mk-mono); font-size:12px;}
+.mk-radio{display:flex; gap:7px; align-items:center; font-size:12.5px; margin-top:3px; color:var(--mk-text-2);}
+.mk-radio b{width:11px; height:11px; border-radius:50%; border:1.5px solid var(--mk-text-3); flex:none;}
+.mk-radio.on{color:var(--mk-text);}
+.mk-radio.on b{border-color:var(--mk-acc); box-shadow:inset 0 0 0 2.5px var(--mk-bg); background:var(--mk-acc);}
+.mk-btn{align-self:flex-start; background:var(--mk-acc); color:#04151a; font-weight:700; font-size:12.5px; border-radius:5px; padding:7px 16px; margin-top:4px;}
+
+/* in-call */
+.mk-call{display:grid; grid-template-columns:1fr 210px;}
+.mk-stage{padding:12px; display:flex; flex-direction:column; gap:10px; min-width:0;}
+.mk-ctrl{display:flex; justify-content:center; gap:8px;}
+.mk-ctrl span{font-size:11.5px; padding:5px 12px; border-radius:999px; background:var(--mk-panel); border:1px solid var(--mk-line); color:var(--mk-text-2);}
+.mk-ctrl span.on{color:var(--mk-acc); border-color:var(--mk-acc);}
+.mk-ctrl span.end{background:var(--mk-bad); border-color:var(--mk-bad); color:#fff; font-weight:600;}
+.mk-side{background:var(--mk-panel); border-left:1px solid var(--mk-line); padding:12px; display:flex; flex-direction:column; gap:10px;}
+.mk-side h5{margin:0; font-family:var(--mk-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--mk-text-3); font-weight:600;}
+.mk-chip{font-family:var(--mk-mono); font-size:11px; border-radius:4px; padding:5px 8px; border:1px solid currentColor;}
+.mk-chip b{display:block; font-size:12px;}
+.mk-ladder{display:flex; flex-direction:column; gap:3px; font-family:var(--mk-mono); font-size:11.5px;}
+.mk-ladder div{display:flex; justify-content:space-between; padding:3px 8px; border-radius:4px; color:var(--mk-text-3);}
+.mk-ladder div.on{background:rgba(79,195,217,.14); color:var(--mk-acc); font-weight:700;}
+.mk-kv{display:grid; grid-template-columns:1fr auto; gap:4px 8px; font-family:var(--mk-mono); font-size:11.5px; color:var(--mk-text-2);}
+.mk-kv b{color:var(--mk-text); font-weight:600; text-align:right;}
+.mk-log{font-family:var(--mk-mono); font-size:10.5px; color:var(--mk-text-3); border-top:1px dashed var(--mk-line); padding-top:8px;}
+
+/* test-pattern run */
+.mk-run{display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:12px;}
+.mk-pattern{background:#101010;}
+.mk-bars{position:absolute; left:8%; right:8%; top:12%; height:16%; display:flex; gap:2px;}
+.mk-bars i{flex:1; background:#f2f2f2;}
+.mk-bars i.k{background:#101010;}
+.mk-clock{position:absolute; left:0; right:0; top:42%; text-align:center; font-family:var(--mk-mono); font-weight:700; font-size:clamp(13px,2.6vw,20px); color:#f2f2f2;}
+.mk-flash{position:absolute; right:8%; bottom:12%; width:15%; aspect-ratio:1; background:#f2f2f2; border-radius:2px;}
+.mk-flash.off{background:#2a2a2a;}
+.mk-frame{position:absolute; left:8%; bottom:12%; font-family:var(--mk-mono); font-size:10.5px; color:#9a9a9a;}
+.mk-runlog{grid-column:1 / -1; font-family:var(--mk-mono); font-size:11.5px; color:var(--mk-text-2); background:var(--mk-panel); border:1px solid var(--mk-line); border-radius:6px; padding:9px 12px; line-height:1.6;}
+.mk-runlog b{color:var(--mk-text);}
+.mk-runlog .g{color:var(--mk-ok);} .mk-runlog .a{color:var(--mk-acc);}
+
+@media (max-width:680px){
+  .mk-join{grid-template-columns:1fr;}
+  .mk-call{grid-template-columns:1fr;}
+  .mk-side{border-left:none; border-top:1px solid var(--mk-line);}
+  .mk-run{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -292,6 +371,101 @@ details.qa .qa-body p{padding-top:12px; margin:0;}
             <div class="term-note">Fake data, real UI. This is what will be running once the call and the stats are real.</div>
           </div>
         </div>
+      </section>
+
+      <section>
+        <h2>The app (mock-ups)</h2>
+        <p>Rough screens for the call app itself, so everyone's picturing the same thing. Nothing here is final; it's a starting point for the client.</p>
+        <div class="mk">
+          <div class="mk-label">1 · Join</div>
+          <div class="mk-win">
+            <div class="mk-bar"><i></i><i></i><i></i><span class="mk-url">10.0.0.254:8080/room/cs4372-g5</span></div>
+            <div class="mk-join">
+              <div>
+                <div class="mk-tile"><div class="mk-person"></div><span class="mk-name">You · preview</span></div>
+                <div class="mk-meter">mic<span></span></div>
+              </div>
+              <div class="mk-form">
+                <h4>Join call</h4>
+                <div class="mk-field"><label>Room</label><div class="mk-input">cs4372-g5</div></div>
+                <div class="mk-field"><label>Your name</label><div class="mk-input">Chris</div></div>
+                <div class="mk-field"><label>Video source</label>
+                  <div class="mk-radio on"><b></b>Camera + mic</div>
+                  <div class="mk-radio"><b></b>Test pattern (for measured runs)</div>
+                </div>
+                <div class="mk-field"><label>Adaptation</label><div class="mk-input">S3 · Delay-aware ladder ▾</div></div>
+                <span class="mk-btn">Join</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="mk-cap">Video source and adaptation strategy are on the join screen, so a measured run is the same app as the demo, not a separate tool.</p>
+
+        <div class="mk">
+          <div class="mk-label">2 · In a call</div>
+          <div class="mk-win">
+            <div class="mk-bar"><i></i><i></i><i></i><span class="mk-url">10.0.0.254:8080/room/cs4372-g5</span></div>
+            <div class="mk-call">
+              <div class="mk-stage">
+                <div class="mk-tile">
+                  <div class="mk-person"></div>
+                  <span class="mk-name">Teammate B</span>
+                  <span class="mk-badge">720p · 30 fps</span>
+                  <div class="mk-tile mk-pip"><div class="mk-person"></div><span class="mk-name">You</span></div>
+                </div>
+                <div class="mk-ctrl"><span>Mic</span><span>Camera</span><span class="on">Stats</span><span class="end">Leave</span></div>
+              </div>
+              <div class="mk-side">
+                <h5>Call health</h5>
+                <div class="mk-chip" style="color:var(--mk-acc);"><b>ADAPTED</b>cause: sender's connection</div>
+                <h5>Ladder</h5>
+                <div class="mk-ladder">
+                  <div><span>1080p</span><span>2.5 Mb/s</span></div>
+                  <div class="on"><span>720p</span><span>1.2 Mb/s</span></div>
+                  <div><span>480p</span><span>0.6 Mb/s</span></div>
+                </div>
+                <div class="mk-kv">
+                  <span>delay</span><b>112 ms</b>
+                  <span>a/v sync</span><b>+14 ms</b>
+                  <span>loss</span><b>0.1%</b>
+                  <span>jitter</span><b>6 ms</b>
+                  <span>buffer</span><b>45 ms</b>
+                  <span>quality</span><b>34.8 dB</b>
+                </div>
+                <div class="mk-log">00:42 stepped down 1080p → 720p</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="mk-cap">The normal call view. The Stats button opens the panel on the right, which shows the same numbers the experiment logs. All numbers here are made up.</p>
+
+        <div class="mk">
+          <div class="mk-label">3 · Measured run (test pattern)</div>
+          <div class="mk-win">
+            <div class="mk-bar"><i></i><i></i><i></i><span class="mk-url">rtpscope run step-4-1-4 --strategy s3</span></div>
+            <div class="mk-run">
+              <div class="mk-tile mk-pattern">
+                <div class="mk-bars"><i></i><i class="k"></i><i></i><i></i><i class="k"></i><i class="k"></i><i></i><i class="k"></i><i></i><i class="k"></i><i></i><i></i><i class="k"></i><i></i><i class="k"></i><i class="k"></i></div>
+                <div class="mk-clock">14:02:31.408</div>
+                <div class="mk-frame">frame 4213</div>
+                <div class="mk-flash"></div>
+                <span class="mk-badge">sent · A</span>
+              </div>
+              <div class="mk-tile mk-pattern">
+                <div class="mk-bars"><i></i><i class="k"></i><i></i><i></i><i class="k"></i><i class="k"></i><i></i><i class="k"></i><i class="k"></i><i></i><i class="k"></i><i></i><i></i><i class="k"></i><i></i><i></i></div>
+                <div class="mk-clock">14:02:31.296</div>
+                <div class="mk-frame">frame 4210</div>
+                <div class="mk-flash off"></div>
+                <span class="mk-badge warn">received · B · 480p</span>
+              </div>
+              <div class="mk-runlog">
+                <b>netem</b> A uplink 4 → <span class="a">1 Mb/s</span> at 00:30 · ladder 1080p → 720p → 480p by 00:34<br>
+                e2e delay <b>112 ms</b> (clock on screen at A minus clock shown at B) · flash vs. beep <b>+14 ms</b> · <span class="g">no freezes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="mk-cap">What an experiment looks like. The sender shows a clock and a barcode instead of a face. Because both sides read the same clock, the gap between what was sent and what is on screen is the delay. The flash square and a beep measure audio/video sync.</p>
       </section>
 
       <section>
