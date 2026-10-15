@@ -1,36 +1,36 @@
-<!DOCTYPE html>
-<html lang="{{ site.lang | default: "en-US" }}">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% seo %}
+  {% feed_meta %}
+  <link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <a class="brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      {% assign section = page.url | split: '/' | slice: 1 | first %}
+      <nav class="site-nav" aria-label="Main">
+        <a href="{{ '/blog/' | relative_url }}"{% if section == 'blog' %} aria-current="page"{% endif %}>Blog</a>
+        <a href="{{ '/projects/' | relative_url }}"{% if section == 'projects' %} aria-current="page"{% endif %}>Projects</a>
+        <a href="{{ '/now/' | relative_url }}"{% if section == 'now' %} aria-current="page"{% endif %}>Now</a>
+      </nav>
+    </header>
 
-{% seo %}
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
-    <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <![endif]-->
-    {% include head-custom.html %}
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
-
-        {% if site.logo %}
-          <img src="{{site.logo | relative_url}}" alt="Logo" />
-        {% endif %}
-
-        <p>{{ site.description | default: site.github.project_tagline }}</p>
-      </header>
-      <section>
-
+    <main>
       {{ content }}
+    </main>
 
-      </section>
-      <footer>
-      </footer>
-    </div>
-    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-  </body>
+    <footer class="site-footer">
+      <span>© {{ site.time | date: '%Y' }} {{ site.author }}</span>
+      <span>
+        <a href="https://github.com/chrisdeso">github</a> ·
+        <a href="{{ '/blog/feed.xml' | relative_url }}">rss</a>
+      </span>
+    </footer>
+  </div>
+</body>
 </html>

@@ -1,0 +1,21 @@
+---
+layout: default
+---
+<article class="prose">
+  <p class="meta">
+    <a href="{{ '/projects/' | relative_url }}">Projects</a> /
+    <span class="status status-{{ page.status }}">{{ page.status }}</span>
+    {% if page.year %}· {{ page.year }}{% endif %}
+    {% if page.course %}· {{ page.course }}{% endif %}
+  </p>
+  <h1 class="page-title">{{ page.title }}</h1>
+  <p class="lede">{{ page.pitch }}</p>
+
+  {% include project-links.html project=page %}
+
+  {% if page.stack %}
+  <p class="stack">{% for s in page.stack %}<code>{{ s }}</code>{% endfor %}</p>
+  {% endif %}
+
+  {{ content }}
+</article>

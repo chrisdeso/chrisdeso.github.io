@@ -1,0 +1,55 @@
+---
+layout: default
+title: home
+---
+{% assign now = site.data.now %}
+<section class="intro">
+  <h1>Hi, I'm Chris.</h1>
+  <p>CS undergrad at <a href="https://cs.txst.edu">Texas State</a> (Jan 2024 – Dec 2026), stay-at-home dad, formerly Support at <a href="https://www.postman.com">Postman</a> (2017–2022), and before that an EFL instructor. I write about what I build and what I learn along the way.</p>
+</section>
+
+<section class="block">
+  <h2 class="section-title">Now</h2>
+  <div class="now-card">
+    {% for section in now.sections limit: 2 %}
+    <div class="now-row">
+    <h3>{{ section.label }}</h3>
+    <ul>
+      {% for item in section.items %}
+      <li>{% if item.url %}<a href="{{ item.url | relative_url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+    </div>
+    {% endfor %}
+    <p class="updated">Updated {{ now.updated | date: '%B %-d, %Y' }}</p>
+  </div>
+  <a class="more" href="{{ '/now/' | relative_url }}">More on what I'm up to →</a>
+</section>
+
+<section class="block">
+  <h2 class="section-title">Recent writing</h2>
+  {% if site.posts.size > 0 %}
+  <ul class="log">
+    {% for post in site.posts limit: 5 %}{% include post-row.html post=post %}{% endfor %}
+  </ul>
+  {% else %}
+  <p class="empty">Nothing here yet. The first post is on its way.</p>
+  {% endif %}
+  <a class="more" href="{{ '/blog/' | relative_url }}">All posts →</a>
+</section>
+
+<section class="block">
+  <h2 class="section-title">Projects</h2>
+  {% assign featured = site.projects | where: 'featured', true | sort: 'order' %}
+  <ul class="cards">
+    {% for p in featured %}{% include project-card.html project=p %}{% endfor %}
+  </ul>
+  <a class="more" href="{{ '/projects/' | relative_url }}">All projects →</a>
+</section>
+
+<section class="block">
+  <h2 class="section-title">Elsewhere</h2>
+  <ul>
+    <li>Crowdsourcing forum moderation using the Discourse API &amp; Postman — <a href="https://blog.postman.com/we-are-always-watching-the-postman-community-forum/">Postman blog</a></li>
+  </ul>
+</section>
