@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Usage: bin/new-post [--note] "Post title"
+set -euo pipefail
+kind=writeup
+if [[ "${1:-}" == "--note" ]]; then kind=note; shift; fi
+title="${1:?usage: bin/new-post [--note] \"Post title\"}"
+slug=$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g')
+file="_posts/$(date +%F)-$slug.md"
+cd "$(dirname "$0")/.."
+[[ -e "$file" ]] && { echo "exists: $file" >&2; exit 1; }
+cat > "$file" <<POST
+---
+title: "$title"
+kind: $kind
+tags: []
+description:
+---
+
+POST
+echo "$file"

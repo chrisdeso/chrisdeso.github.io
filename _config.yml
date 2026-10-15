@@ -1,8 +1,40 @@
 title: chrisdeso
 description: finding nemo 🐠
+url: https://chrisdeso.com
+author: Chris de Sousa
+lang: en-US
 
-remote_theme: pages-themes/minimal@v0.2.0
+timezone: America/Chicago
+permalink: /blog/:year/:month/:title/
+
 plugins:
-- jekyll-remote-theme
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
 
-favicon: /favi-dog.png
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+defaults:
+  - scope: { path: "", type: posts }
+    values: { layout: post }
+  - scope: { path: "", type: projects }
+    values: { layout: project }
+  - scope: { path: "" }
+    values: { layout: page }
+
+# Order shown on /projects/ and the homepage.
+project_status_order: [active, shipped, coursework, idea, archived]
+
+feed:
+  path: blog/feed.xml
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - bin
+  - .bundle

@@ -1,0 +1,33 @@
+---
+layout: default
+title: Projects
+description: Things Chris has built, is building, or might build.
+---
+<h1 class="page-title">Projects</h1>
+
+<div class="filters" role="group" aria-label="Filter by status">
+  <button type="button" data-filter="all" aria-pressed="true">all</button>
+  {% for s in site.project_status_order %}
+    {% assign count = site.projects | where: 'status', s | size %}
+    {% if count > 0 %}<button type="button" data-filter="{{ s }}" aria-pressed="false">{{ s }} <span class="dim">{{ count }}</span></button>{% endif %}
+  {% endfor %}
+</div>
+
+<ul class="cards">
+{% for s in site.project_status_order %}
+  {% assign group = site.projects | where: 'status', s | sort: 'order' %}
+  {% for p in group %}{% include project-card.html project=p %}{% endfor %}
+{% endfor %}
+</ul>
+
+<script>
+  document.querySelectorAll('.filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter;
+      document.querySelectorAll('.filters button').forEach(b => b.setAttribute('aria-pressed', b === btn));
+      document.querySelectorAll('.cards .card').forEach(c => {
+        c.hidden = f !== 'all' && c.dataset.status !== f;
+      });
+    });
+  });
+</script>

@@ -1,0 +1,8 @@
+{%- assign p = include.project -%}
+{%- if p.links -%}
+<p class="links">
+  {%- for link in p.links -%}
+  <a href="{{ link[1] }}">{{ link[0] }} ↗</a>
+  {%- endfor -%}
+</p>
+{%- endif -%}

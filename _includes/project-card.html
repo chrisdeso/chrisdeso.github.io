@@ -1,0 +1,11 @@
+{%- assign p = include.project -%}
+<li class="card" data-status="{{ p.status }}">
+  <div class="card-head">
+    <a class="card-title" href="{{ p.url | relative_url }}">{{ p.title }}</a>
+    <span class="status status-{{ p.status }}">{{ p.status }}</span>
+  </div>
+  <p>{{ p.pitch }}</p>
+  {%- if p.stack %}
+  <p class="stack">{% for s in p.stack limit: 4 %}<code>{{ s }}</code>{% endfor %}</p>
+  {%- endif %}
+</li>

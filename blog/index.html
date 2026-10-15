@@ -1,0 +1,32 @@
+---
+layout: default
+title: Blog
+description: Notes and write-ups from Chris.
+---
+<h1 class="page-title">Blog</h1>
+<p class="dim">Short <span class="kind kind-note">note</span>s and longer <span class="kind kind-writeup">writeup</span>s. <a href="{{ '/blog/feed.xml' | relative_url }}">RSS</a>.</p>
+
+{% if site.posts.size == 0 %}
+<p class="empty">Nothing here yet. The first post is on its way.</p>
+{% endif %}
+
+{% assign by_year = site.posts | group_by_exp: 'post', "post.date | date: '%Y'" %}
+{% for year in by_year %}
+<h2 class="year">{{ year.name }}</h2>
+<ul class="log">
+  {% for post in year.items %}{% include post-row.html post=post %}{% endfor %}
+</ul>
+{% endfor %}
+
+{% if site.tags.size > 0 %}
+<h2 class="year">tags</h2>
+{% assign tags = site.tags | sort %}
+{% for tag in tags %}
+<section class="tag-group" id="{{ tag[0] | slugify }}">
+  <h3>#{{ tag[0] }} <span class="dim">({{ tag[1].size }})</span></h3>
+  <ul class="log">
+    {% for post in tag[1] %}{% include post-row.html post=post %}{% endfor %}
+  </ul>
+</section>
+{% endfor %}
+{% endif %}

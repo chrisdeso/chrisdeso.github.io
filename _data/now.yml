@@ -1,0 +1,23 @@
+# Edit this file to update /now and the homepage "Now" card.
+updated: 2026-10-15
+headline: Final semester of a CS degree at Texas State — graduating December 2026.
+
+sections:
+  - label: building
+    items:
+      - text: rtpscope — a WebRTC call that explains its own quality drops (CS 4372)
+        url: /projects/rtpscope/
+      - text: this site
+  - label: studying
+    items:
+      - text: CS 4372 Multimedia Systems
+      - text: CS 4347 Machine Learning
+      - text: MATH 3398 Discrete Math 2
+  - label: looking for
+    items:
+      - text: Software / Support Engineering roles starting January 2027 — say hi on
+        links:
+          - label: GitHub
+            url: https://github.com/chrisdeso
+          - label: LinkedIn
+            url: https://linkedin.com/in/chrisdeso
