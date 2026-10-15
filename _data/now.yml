@@ -1,6 +1,6 @@
 # Edit this file to update /now and the homepage "Now" card.
 updated: 2026-10-15
-headline: Final semester of a CS degree at Texas State — graduating December 2026.
+headline: Final semester of a Computer Science degree at Texas State University — graduating December 2026.
 
 sections:
   - label: building
@@ -21,3 +21,8 @@ sections:
             url: https://github.com/chrisdeso
           - label: LinkedIn
             url: https://linkedin.com/in/chrisdeso
+
+  - label: reading
+    items:
+      - text: American Hagwon
+      - text: by Min Jin Lee
