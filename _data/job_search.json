@@ -37,6 +37,19 @@
       "via": "email",
       "applied": null,
       "updated": "2026-10-16"
+    },
+    {
+      "company": "Boom",
+      "role": "Director of Product Support",
+      "lane": "Support",
+      "stages": [
+        "Recruiter outreach",
+        "Recruiter screen"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": null,
+      "updated": "2026-10-03"
     }
   ]
 }

@@ -32,6 +32,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
   .js-table tr.on td { background: var(--accent-soft); }
   .js-table td.when { color: var(--text-3); font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .js-role { color: var(--text-2); font-size: 13px; }
+  .js-quiet { display: block; color: var(--text-3); font-size: 12px; }
   .js-chip { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
   .js-chip.waiting { color: var(--js-wait); }
   .js-chip.moving { color: var(--st-active); }
@@ -44,7 +45,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
 
 <p class="meta">Updated <time datetime="{{ js.generated }}">{{ js.generated | date: '%b %-d, %Y' }}</time></p>
 
-<p class="lede">I'm looking for technical support engineering and junior software engineering roles while I finish my CS degree. This page shows every role I've applied to, how far each one got, and how it ended, auto-rejections and ghostings included.</p>
+<p class="lede">I'm looking for technical support engineering and junior software engineering roles while I finish my CS degree. This page shows every role I've applied to or been recruited for, how far each one got, and how it ended, auto-rejections and ghostings included.</p>
 
 <div class="js-stats" id="js-stats" aria-live="polite"></div>
 
@@ -78,15 +79,23 @@ description: Where my 2026 job search stands, from application to outcome. Updat
 (function () {
   var data = JSON.parse(document.getElementById('js-data').textContent);
   var apps = data.applications.map(function (a, i) { return Object.assign({ id: i }, a); });
-  var STEPS = ['Applied', 'Recruiter screen', 'Hiring manager screen', 'Assessment', 'Technical interview', 'Panel / final round', 'Offer'];
-  var BROAD = { 'Applied': 'Applied', 'Recruiter screen': 'Screening', 'Hiring manager screen': 'Screening',
+  var ENTRIES = ['Applied', 'Recruiter outreach'];
+  var STEPS = ['Recruiter screen', 'Hiring manager screen', 'Assessment', 'Technical interview', 'Panel / final round', 'Offer'];
+  var LABEL = { 'Recruiter outreach': 'Recruiter reached out' };
+  var BROAD = { 'Applied': 'Applied', 'Recruiter outreach': 'Recruiter reached out', 'Recruiter screen': 'Screening', 'Hiring manager screen': 'Screening',
                 'Assessment': 'Technical', 'Technical interview': 'Technical', 'Panel / final round': 'Final round', 'Offer': 'Offer' };
   var lane = 'all', detail = 'broad';
 
   function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
   function last(a) { return a.stages[a.stages.length - 1]; }
-  function depth(a) { return STEPS.indexOf(last(a)); }
-  function stageName(s) { return detail === 'broad' ? BROAD[s] : s; }
+  // 0 for an entry point (applied or recruited), then 1..6 through the steps.
+  function depth(a) { return ENTRIES.indexOf(last(a)) >= 0 ? 0 : STEPS.indexOf(last(a)) + 1; }
+  function label(s) { return LABEL[s] || s; }
+  function stageName(s) { return detail === 'broad' ? BROAD[s] : label(s); }
+  function quietDays(a) {
+    var d = a.updated || a.applied;
+    return d ? Math.max(0, Math.floor((Date.now() - new Date(d + 'T12:00:00')) / 864e5)) : null;
+  }
 
   // Where an application ended up: sink node label, status text, and color class.
   function terminal(a) {
@@ -98,8 +107,8 @@ description: Where my 2026 job search stands, from application to outcome. Updat
       case 'Accepted': return { node: 'Accepted', chip: 'Accepted', cls: 'moving' };
       case 'Declined': return { node: 'Declined', chip: 'Declined offer', cls: 'ghosted' };
       default:
-        if (last(a) === 'Applied') return { node: 'Awaiting reply', chip: 'Awaiting reply', cls: 'waiting' };
-        return { node: 'In process', chip: 'In process', cls: 'moving' };
+        if (depth(a) === 0) return { node: 'Awaiting reply', chip: 'Awaiting reply', cls: 'waiting' };
+        return { node: 'In process', chip: 'In process', cls: 'waiting' };
     }
   }
 
@@ -120,7 +129,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
   // Vertical order within a column: furthest progress on top, dead ends at the bottom.
   var ORDER = ['Offer', 'Accepted', 'Final round', 'Panel / final round',
                'Technical', 'Technical interview', 'Assessment', 'Screening', 'Hiring manager screen', 'Recruiter screen',
-               'Applied', 'In process', 'Awaiting reply', 'Declined', 'Withdrew', 'Rejected', 'Auto-rejected', 'Ghosted'];
+               'Recruiter reached out', 'Applied', 'In process', 'Awaiting reply', 'Declined', 'Withdrew', 'Rejected', 'Auto-rejected', 'Ghosted'];
   function rank(name) { var i = ORDER.indexOf(name); return i < 0 ? 99 : i; }
 
   function shown() { return apps.filter(function (a) { return lane === 'all' || a.lane === lane; }); }
@@ -128,10 +137,9 @@ description: Where my 2026 job search stands, from application to outcome. Updat
   function renderStats() {
     var list = shown();
     var count = function (f) { return list.filter(f).length; };
-    var heard = count(function (a) { return depth(a) > 0 || (a.outcome !== 'Pending' && a.outcome !== 'Ghosted'); });
     var stats = [
-      [list.length, 'applications sent'],
-      [list.length ? Math.round(100 * heard / list.length) + '%' : '–', 'heard back'],
+      [count(function (a) { return a.stages[0] === 'Applied'; }), 'applications sent'],
+      [count(function (a) { return a.stages[0] === 'Recruiter outreach'; }), 'recruiters reached out'],
       [count(function (a) { return a.outcome === 'Auto-rejected'; }), 'auto-rejected'],
       [count(function (a) { return depth(a) >= 1; }), 'reached a screen'],
       [count(function (a) { return depth(a) >= 3; }), 'reached interviews'],
@@ -152,8 +160,10 @@ description: Where my 2026 job search stands, from application to outcome. Updat
     tip.innerHTML = '';
     var strong = document.createElement('strong'); strong.textContent = a.company;
     var role = document.createElement('small'); role.textContent = a.role;
-    var route = document.createElement('small'); route.textContent = a.stages.join(' → ');
-    var st = document.createElement('small'); st.textContent = terminal(a).chip + (a.applied ? ' · applied ' + a.applied : '');
+    var route = document.createElement('small'); route.textContent = a.stages.map(label).join(' → ');
+    var q = quietDays(a);
+    var st = document.createElement('small');
+    st.textContent = terminal(a).chip + (a.outcome === 'Pending' && q != null ? ' · ' + q + ' days since last contact' : '');
     tip.append(strong, role, route, st);
     tip.hidden = false;
     var x = Math.min(evt.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
@@ -230,10 +240,16 @@ description: Where my 2026 job search stands, from application to outcome. Updat
       var role = document.createElement('div'); role.className = 'js-role'; role.textContent = a.role;
       c.append(name, role);
       var l = document.createElement('td'); l.className = 'lane'; l.textContent = a.lane === 'SWE' ? 'SWE' : 'Support';
-      var f = document.createElement('td'); f.textContent = last(a);
+      var f = document.createElement('td'); f.textContent = label(last(a));
       var s = document.createElement('td');
       var chip = document.createElement('span'); chip.className = 'js-chip ' + t.cls; chip.textContent = t.chip;
       s.append(chip);
+      var q = quietDays(a);
+      if (a.outcome === 'Pending' && q != null) {
+        var quiet = document.createElement('span'); quiet.className = 'js-quiet';
+        quiet.textContent = q + ' days since last contact';
+        s.append(quiet);
+      }
       tr.append(c, l, f, s);
       tr.addEventListener('mouseenter', function () { focus(a.id); });
       tr.addEventListener('mouseleave', function () { focus(null); });
