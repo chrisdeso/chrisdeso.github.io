@@ -1,0 +1,261 @@
+---
+title: Job search
+permalink: /job-search/
+description: Where my 2026 job search stands, from application to outcome. Updated as things happen.
+---
+{% assign js = site.data.job_search %}
+<style>
+  :root { --js-wait: #a87f00; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --js-wait: #e0bd4f; } }
+  :root[data-theme="dark"] { --js-wait: #e0bd4f; }
+  .js-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-2); margin: 4px 0 0; }
+  .js-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .js-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 10px; margin: 24px 0 8px; }
+  .js-stat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+  .js-stat b { display: block; font-size: 24px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .js-stat span { display: block; font-size: 12px; line-height: 1.35; color: var(--text-3); }
+  .js-chart { margin: 20px 0 6px; overflow-x: auto; }
+  .js-chart svg { display: block; min-width: 560px; width: 100%; height: auto; }
+  .js-chart text { font: 12px var(--font-sans); fill: var(--text); }
+  .js-chart text .n { fill: var(--text-3); }
+  .js-link { fill: none; stroke-opacity: .32; transition: stroke-opacity .15s; cursor: pointer; }
+  .js-chart.focus .js-link { stroke-opacity: .07; }
+  .js-chart.focus .js-link.on { stroke-opacity: .75; }
+  .js-tip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface); border: 1px solid var(--line);
+            border-radius: 6px; padding: 6px 10px; font-size: 13px; line-height: 1.4; box-shadow: 0 4px 14px rgba(0,0,0,.12); max-width: 260px; }
+  .js-tip[hidden] { display: none; }
+  .js-tip small { color: var(--text-3); display: block; }
+  .js-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+  .js-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line); }
+  .js-table td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--line); vertical-align: baseline; }
+  .js-table tr { cursor: pointer; }
+  .js-table tr.on td { background: var(--accent-soft); }
+  .js-table td.when { color: var(--text-3); font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .js-role { color: var(--text-2); font-size: 13px; }
+  .js-chip { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .js-chip.waiting { color: var(--js-wait); }
+  .js-chip.moving { color: var(--st-active); }
+  .js-chip.rejected { color: var(--mod); }
+  .js-chip.ghosted { color: var(--st-archived); }
+  @media (max-width: 520px) {
+    .js-table .lane, .js-table th.lane { display: none; }
+  }
+</style>
+
+<p class="meta">Updated <time datetime="{{ js.generated }}">{{ js.generated | date: '%b %-d, %Y' }}</time></p>
+
+<p class="lede">I'm looking for technical support engineering and junior software engineering roles while I finish my CS degree. This page shows every role I've applied to, how far each one got, and how it ended, auto-rejections and ghostings included.</p>
+
+<div class="js-stats" id="js-stats" aria-live="polite"></div>
+
+<h2>Pipeline</h2>
+<p class="dim">Each strand is one application. Hover a strand or a row below to trace it.</p>
+<div class="filters" id="js-filters" role="group" aria-label="Filter by track">
+  <button type="button" data-lane="all" aria-pressed="true">All</button>
+  <button type="button" data-lane="Support" aria-pressed="false">Support engineering</button>
+  <button type="button" data-lane="SWE" aria-pressed="false">Software engineering</button>
+</div>
+<div class="filters" id="js-detail" role="group" aria-label="Stage detail">
+  <button type="button" data-detail="broad" aria-pressed="true">Broad stages</button>
+  <button type="button" data-detail="detailed" aria-pressed="false">Every step</button>
+</div>
+<p class="js-legend"><span><i style="background:var(--st-shipped)"></i>Support engineering</span><span><i style="background:var(--st-coursework)"></i>Software engineering</span></p>
+<div class="js-chart" id="js-chart" role="img" aria-label="Sankey diagram of job applications by stage and outcome"></div>
+<div class="js-tip" id="js-tip" hidden></div>
+
+<h2>Every application</h2>
+<table class="js-table">
+  <thead><tr><th>Company</th><th class="lane">Track</th><th>Furthest stage</th><th>Status</th></tr></thead>
+  <tbody id="js-rows"></tbody>
+</table>
+
+<p class="aside">Know someone at one of these companies, or hiring for something similar? I'd love to hear from you through <a href="https://github.com/chrisdeso">GitHub</a>. "Auto-rejected" means a templated rejection with no human contact. "Ghosted" means no word for {{ js.ghost_days }} days after the last contact.</p>
+
+<script id="js-data" type="application/json">{{ js | jsonify }}</script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script>
+(function () {
+  var data = JSON.parse(document.getElementById('js-data').textContent);
+  var apps = data.applications.map(function (a, i) { return Object.assign({ id: i }, a); });
+  var STEPS = ['Applied', 'Recruiter screen', 'Hiring manager screen', 'Assessment', 'Technical interview', 'Panel / final round', 'Offer'];
+  var BROAD = { 'Applied': 'Applied', 'Recruiter screen': 'Screening', 'Hiring manager screen': 'Screening',
+                'Assessment': 'Technical', 'Technical interview': 'Technical', 'Panel / final round': 'Final round', 'Offer': 'Offer' };
+  var lane = 'all', detail = 'broad';
+
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function last(a) { return a.stages[a.stages.length - 1]; }
+  function depth(a) { return STEPS.indexOf(last(a)); }
+  function stageName(s) { return detail === 'broad' ? BROAD[s] : s; }
+
+  // Where an application ended up: sink node label, status text, and color class.
+  function terminal(a) {
+    switch (a.outcome) {
+      case 'Auto-rejected': return { node: 'Auto-rejected', chip: 'Auto-rejected', cls: 'rejected' };
+      case 'Rejected': return { node: 'Rejected', chip: 'Rejected' + (a.via ? ' via ' + a.via : ''), cls: 'rejected' };
+      case 'Ghosted': return { node: 'Ghosted', chip: 'Ghosted', cls: 'ghosted' };
+      case 'Withdrawn': return { node: 'Withdrew', chip: 'Withdrew', cls: 'ghosted' };
+      case 'Accepted': return { node: 'Accepted', chip: 'Accepted', cls: 'moving' };
+      case 'Declined': return { node: 'Declined', chip: 'Declined offer', cls: 'ghosted' };
+      default:
+        if (last(a) === 'Applied') return { node: 'Awaiting reply', chip: 'Awaiting reply', cls: 'waiting' };
+        return { node: 'In process', chip: 'In process', cls: 'moving' };
+    }
+  }
+
+  function path(a) {
+    var p = [];
+    a.stages.forEach(function (s) { var n = stageName(s); if (p[p.length - 1] !== n) p.push(n); });
+    p.push(terminal(a).node);
+    return p;
+  }
+
+  function nodeColor(name) {
+    if (name === 'Auto-rejected' || name === 'Rejected') return css('--mod');
+    if (name === 'Ghosted' || name === 'Withdrew' || name === 'Declined') return css('--text-3');
+    if (name === 'Awaiting reply' || name === 'In process') return css('--js-wait');
+    return css('--accent');
+  }
+
+  // Vertical order within a column: furthest progress on top, dead ends at the bottom.
+  var ORDER = ['Offer', 'Accepted', 'Final round', 'Panel / final round',
+               'Technical', 'Technical interview', 'Assessment', 'Screening', 'Hiring manager screen', 'Recruiter screen',
+               'Applied', 'In process', 'Awaiting reply', 'Declined', 'Withdrew', 'Rejected', 'Auto-rejected', 'Ghosted'];
+  function rank(name) { var i = ORDER.indexOf(name); return i < 0 ? 99 : i; }
+
+  function shown() { return apps.filter(function (a) { return lane === 'all' || a.lane === lane; }); }
+
+  function renderStats() {
+    var list = shown();
+    var count = function (f) { return list.filter(f).length; };
+    var heard = count(function (a) { return depth(a) > 0 || (a.outcome !== 'Pending' && a.outcome !== 'Ghosted'); });
+    var stats = [
+      [list.length, 'applications sent'],
+      [list.length ? Math.round(100 * heard / list.length) + '%' : '–', 'heard back'],
+      [count(function (a) { return a.outcome === 'Auto-rejected'; }), 'auto-rejected'],
+      [count(function (a) { return depth(a) >= 1; }), 'reached a screen'],
+      [count(function (a) { return depth(a) >= 3; }), 'reached interviews'],
+      [count(function (a) { return a.outcome === 'Ghosted'; }), 'ghosted']
+    ];
+    var el = document.getElementById('js-stats');
+    el.innerHTML = '';
+    stats.forEach(function (s) {
+      var d = document.createElement('div'); d.className = 'js-stat';
+      var b = document.createElement('b'); b.textContent = s[0];
+      var t = document.createElement('span'); t.textContent = s[1];
+      d.append(b, t); el.append(d);
+    });
+  }
+
+  var tip = document.getElementById('js-tip');
+  function showTip(evt, a) {
+    tip.innerHTML = '';
+    var strong = document.createElement('strong'); strong.textContent = a.company;
+    var role = document.createElement('small'); role.textContent = a.role;
+    var route = document.createElement('small'); route.textContent = a.stages.join(' → ');
+    var st = document.createElement('small'); st.textContent = terminal(a).chip + (a.applied ? ' · applied ' + a.applied : '');
+    tip.append(strong, role, route, st);
+    tip.hidden = false;
+    var x = Math.min(evt.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = x + 'px'; tip.style.top = (evt.clientY + 14) + 'px';
+  }
+  function hideTip() { tip.hidden = true; }
+
+  var chart = document.getElementById('js-chart');
+  function focus(id) {
+    chart.classList.toggle('focus', id != null);
+    chart.querySelectorAll('.js-link').forEach(function (l) { l.classList.toggle('on', +l.dataset.app === id); });
+    document.querySelectorAll('#js-rows tr').forEach(function (r) { r.classList.toggle('on', +r.dataset.app === id); });
+  }
+
+  function renderChart() {
+    var list = shown();
+    chart.innerHTML = '';
+    if (!list.length) { chart.innerHTML = '<p class="empty">No applications sent yet.</p>'; return; }
+    var names = new Set(), links = [];
+    list.forEach(function (a) {
+      var p = path(a);
+      p.forEach(function (n) { names.add(n); });
+      for (var i = 0; i < p.length - 1; i++) links.push({ source: p[i], target: p[i + 1], value: 1, app: a });
+    });
+    // Give each column room for its label; wide layouts scroll inside the chart box.
+    var cols = d3.max(list, function (a) { return path(a).length; });
+    var width = Math.max(chart.clientWidth, 560, cols * 140 + 40), height = Math.max(200, list.length * 18 + 60);
+    var graph = d3.sankey()
+      .nodeId(function (d) { return d.name; })
+      .nodeWidth(10).nodePadding(16)
+      .nodeAlign(d3.sankeyLeft)
+      .nodeSort(function (a, b) { return rank(a.name) - rank(b.name); })
+      .extent([[1, 8], [width - 120, height - 8]])({
+        nodes: Array.from(names, function (n) { return { name: n }; }),
+        links: links
+      });
+
+    var svg = d3.select(chart).append('svg').attr('viewBox', [0, 0, width, height]).style('min-width', width + 'px');
+    svg.append('g').selectAll('path').data(graph.links).join('path')
+      .attr('class', 'js-link')
+      .attr('d', d3.sankeyLinkHorizontal())
+      .attr('stroke', function (d) { return css(d.app.lane === 'SWE' ? '--st-coursework' : '--st-shipped'); })
+      .attr('stroke-width', function (d) { return Math.max(1, d.width); })
+      .attr('data-app', function (d) { return d.app.id; })
+      .on('mousemove', function (e, d) { focus(d.app.id); showTip(e, d.app); })
+      .on('mouseleave', function () { focus(null); hideTip(); });
+
+    var node = svg.append('g').selectAll('g').data(graph.nodes).join('g');
+    node.append('rect')
+      .attr('x', function (d) { return d.x0; }).attr('y', function (d) { return d.y0; })
+      .attr('width', function (d) { return d.x1 - d.x0; })
+      .attr('height', function (d) { return Math.max(2, d.y1 - d.y0); })
+      .attr('rx', 2).attr('fill', function (d) { return nodeColor(d.name); });
+    var label = node.append('text')
+      .attr('x', function (d) { return d.x1 + 6; })
+      .attr('y', function (d) { return (d.y0 + d.y1) / 2; })
+      .attr('dy', '0.35em');
+    label.append('tspan').text(function (d) { return d.name + ' '; });
+    label.append('tspan').attr('class', 'n').text(function (d) { return d.value; });
+  }
+
+  function renderRows() {
+    var order = { moving: 0, waiting: 1, rejected: 2, ghosted: 3 };
+    var list = shown().slice().sort(function (a, b) {
+      return order[terminal(a).cls] - order[terminal(b).cls] || depth(b) - depth(a) || a.company.localeCompare(b.company);
+    });
+    var body = document.getElementById('js-rows');
+    body.innerHTML = '';
+    list.forEach(function (a) {
+      var t = terminal(a);
+      var tr = document.createElement('tr'); tr.dataset.app = a.id;
+      var c = document.createElement('td');
+      var name = document.createElement('div'); name.textContent = a.company;
+      var role = document.createElement('div'); role.className = 'js-role'; role.textContent = a.role;
+      c.append(name, role);
+      var l = document.createElement('td'); l.className = 'lane'; l.textContent = a.lane === 'SWE' ? 'SWE' : 'Support';
+      var f = document.createElement('td'); f.textContent = last(a);
+      var s = document.createElement('td');
+      var chip = document.createElement('span'); chip.className = 'js-chip ' + t.cls; chip.textContent = t.chip;
+      s.append(chip);
+      tr.append(c, l, f, s);
+      tr.addEventListener('mouseenter', function () { focus(a.id); });
+      tr.addEventListener('mouseleave', function () { focus(null); });
+      body.append(tr);
+    });
+  }
+
+  function render() { renderStats(); renderChart(); renderRows(); }
+
+  function toggle(groupId, attr, set) {
+    document.getElementById(groupId).addEventListener('click', function (e) {
+      var btn = e.target.closest('button'); if (!btn) return;
+      set(btn.dataset[attr]);
+      this.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', b === btn); });
+      render();
+    });
+  }
+  toggle('js-filters', 'lane', function (v) { lane = v; });
+  toggle('js-detail', 'detail', function (v) { detail = v; });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderChart);
+  var resizeTimer;
+  window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderChart, 150); });
+  render();
+})();
+</script>

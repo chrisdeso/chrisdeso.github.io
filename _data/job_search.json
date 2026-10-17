@@ -1,0 +1,42 @@
+{
+  "generated": "2026-10-17",
+  "ghost_days": 30,
+  "applications": [
+    {
+      "company": "HackerRank",
+      "role": "Customer Experience Engineer, L2",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Auto-rejected",
+      "via": "email",
+      "applied": null,
+      "updated": "2026-10-17"
+    },
+    {
+      "company": "Agave",
+      "role": "Technical Support Engineer",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Auto-rejected",
+      "via": "email",
+      "applied": null,
+      "updated": "2026-10-16"
+    },
+    {
+      "company": "Corridor",
+      "role": "Technical Support Engineer",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Auto-rejected",
+      "via": "email",
+      "applied": null,
+      "updated": "2026-10-16"
+    }
+  ]
+}
