@@ -1,13 +1,13 @@
 ---
 title: Job search
 permalink: /job-search/
-description: Where my 2026 job search stands, from application to outcome. Updated as things happen.
+description: Where my 2026+ job search stands, from application to outcome. Updated as things happen.
 ---
 {% assign js = site.data.job_search %}
 <style>
-  :root { --js-wait: #a87f00; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --js-wait: #e0bd4f; } }
-  :root[data-theme="dark"] { --js-wait: #e0bd4f; }
+  :root { --js-wait: #a87f00; --js-data: #0b7285; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --js-wait: #e0bd4f; --js-data: #66d9e8; } }
+  :root[data-theme="dark"] { --js-wait: #e0bd4f; --js-data: #66d9e8; }
   .js-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-2); margin: 4px 0 0; }
   .js-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
   .js-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 10px; margin: 24px 0 8px; }
@@ -45,7 +45,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
 
 <p class="meta">Updated <time datetime="{{ js.generated }}">{{ js.generated | date: '%b %-d, %Y' }}</time></p>
 
-<p class="lede">I'm looking for technical support engineering and junior software engineering roles while I finish my CS degree. This page shows every role I've applied to or been recruited for, how far each one got, and how it ended, auto-rejections and ghostings included.</p>
+<p class="lede">I'm looking for support engineering and entry level software engineering roles while. This page shows every role I've applied to or been recruited for, how far each one got, and how it ended, auto-rejections and ghostings included.</p>
 
 <div class="js-stats" id="js-stats" aria-live="polite"></div>
 
@@ -55,12 +55,13 @@ description: Where my 2026 job search stands, from application to outcome. Updat
   <button type="button" data-lane="all" aria-pressed="true">All</button>
   <button type="button" data-lane="Support" aria-pressed="false">Support engineering</button>
   <button type="button" data-lane="SWE" aria-pressed="false">Software engineering</button>
+  <button type="button" data-lane="Data" aria-pressed="false">Data &amp; analytics</button>
 </div>
 <div class="filters" id="js-detail" role="group" aria-label="Stage detail">
   <button type="button" data-detail="broad" aria-pressed="true">Broad stages</button>
   <button type="button" data-detail="detailed" aria-pressed="false">Every step</button>
 </div>
-<p class="js-legend"><span><i style="background:var(--st-shipped)"></i>Support engineering</span><span><i style="background:var(--st-coursework)"></i>Software engineering</span></p>
+<p class="js-legend"><span><i style="background:var(--st-shipped)"></i>Support engineering</span><span><i style="background:var(--st-coursework)"></i>Software engineering</span><span><i style="background:var(--js-data)"></i>Data &amp; analytics</span></p>
 <div class="js-chart" id="js-chart" role="img" aria-label="Sankey diagram of job applications by stage and outcome"></div>
 <div class="js-tip" id="js-tip" hidden></div>
 
@@ -70,7 +71,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
   <tbody id="js-rows"></tbody>
 </table>
 
-<p class="aside">Know someone at one of these companies, or hiring for something similar? I'd love to hear from you through <a href="https://github.com/chrisdeso">GitHub</a>. "Auto-rejected" means a templated rejection with no human contact. "Ghosted" means no word for {{ js.ghost_days }} days after the last contact.</p>
+<p class="aside">Know someone at one of these companies, or hiring for something similar? I'd love to hear from you chris [at] chrisdeso [dot] com . "Auto-rejected" means a templated rejection with no human contact. "Ghosted" means no word for {{ js.ghost_days }} days after the last contact.</p>
 
 <script id="js-data" type="application/json">{{ js | jsonify }}</script>
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
@@ -79,10 +80,12 @@ description: Where my 2026 job search stands, from application to outcome. Updat
 (function () {
   var data = JSON.parse(document.getElementById('js-data').textContent);
   var apps = data.applications.map(function (a, i) { return Object.assign({ id: i }, a); });
-  var ENTRIES = ['Applied', 'Recruiter outreach'];
+  var ENTRIES = ['Applied', 'Referral', 'Recruiter outreach'];
   var STEPS = ['Recruiter screen', 'Hiring manager screen', 'Assessment', 'Technical interview', 'Panel / final round', 'Offer'];
-  var LABEL = { 'Recruiter outreach': 'Recruiter reached out' };
-  var BROAD = { 'Applied': 'Applied', 'Recruiter outreach': 'Recruiter reached out', 'Recruiter screen': 'Screening', 'Hiring manager screen': 'Screening',
+  var LABEL = { 'Referral': 'Referred', 'Recruiter outreach': 'Recruiter reached out' };
+  var LANE_COLOR = { Support: '--st-shipped', SWE: '--st-coursework', Data: '--js-data' };
+  var LANE_SHORT = { Support: 'Support', SWE: 'SWE', Data: 'Data' };
+  var BROAD = { 'Applied': 'Applied', 'Referral': 'Referred', 'Recruiter outreach': 'Recruiter reached out', 'Recruiter screen': 'Screening', 'Hiring manager screen': 'Screening',
                 'Assessment': 'Technical', 'Technical interview': 'Technical', 'Panel / final round': 'Final round', 'Offer': 'Offer' };
   var lane = 'all', detail = 'broad';
 
@@ -129,7 +132,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
   // Vertical order within a column: furthest progress on top, dead ends at the bottom.
   var ORDER = ['Offer', 'Accepted', 'Final round', 'Panel / final round',
                'Technical', 'Technical interview', 'Assessment', 'Screening', 'Hiring manager screen', 'Recruiter screen',
-               'Recruiter reached out', 'Applied', 'In process', 'Awaiting reply', 'Declined', 'Withdrew', 'Rejected', 'Auto-rejected', 'Ghosted'];
+               'Referred', 'Recruiter reached out', 'Applied', 'In process', 'Awaiting reply', 'Declined', 'Withdrew', 'Rejected', 'Auto-rejected', 'Ghosted'];
   function rank(name) { var i = ORDER.indexOf(name); return i < 0 ? 99 : i; }
 
   function shown() { return apps.filter(function (a) { return lane === 'all' || a.lane === lane; }); }
@@ -138,8 +141,8 @@ description: Where my 2026 job search stands, from application to outcome. Updat
     var list = shown();
     var count = function (f) { return list.filter(f).length; };
     var stats = [
-      [count(function (a) { return a.stages[0] === 'Applied'; }), 'applications sent'],
-      [count(function (a) { return a.stages[0] === 'Recruiter outreach'; }), 'recruiters reached out'],
+      [count(function (a) { return a.stages[0] === 'Applied'; }), 'cold applications'],
+      [count(function (a) { return a.stages[0] !== 'Applied'; }), 'referrals or recruiter outreach'],
       [count(function (a) { return a.outcome === 'Auto-rejected'; }), 'auto-rejected'],
       [count(function (a) { return depth(a) >= 1; }), 'reached a screen'],
       [count(function (a) { return depth(a) >= 3; }), 'reached interviews'],
@@ -205,7 +208,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
     svg.append('g').selectAll('path').data(graph.links).join('path')
       .attr('class', 'js-link')
       .attr('d', d3.sankeyLinkHorizontal())
-      .attr('stroke', function (d) { return css(d.app.lane === 'SWE' ? '--st-coursework' : '--st-shipped'); })
+      .attr('stroke', function (d) { return css(LANE_COLOR[d.app.lane] || '--st-shipped'); })
       .attr('stroke-width', function (d) { return Math.max(1, d.width); })
       .attr('data-app', function (d) { return d.app.id; })
       .on('mousemove', function (e, d) { focus(d.app.id); showTip(e, d.app); })
@@ -239,7 +242,7 @@ description: Where my 2026 job search stands, from application to outcome. Updat
       var name = document.createElement('div'); name.textContent = a.company;
       var role = document.createElement('div'); role.className = 'js-role'; role.textContent = a.role;
       c.append(name, role);
-      var l = document.createElement('td'); l.className = 'lane'; l.textContent = a.lane === 'SWE' ? 'SWE' : 'Support';
+      var l = document.createElement('td'); l.className = 'lane'; l.textContent = LANE_SHORT[a.lane] || a.lane;
       var f = document.createElement('td'); f.textContent = label(last(a));
       var s = document.createElement('td');
       var chip = document.createElement('span'); chip.className = 'js-chip ' + t.cls; chip.textContent = t.chip;
