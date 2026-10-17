@@ -14,6 +14,7 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
   .js-stat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
   .js-stat b { display: block; font-size: 24px; line-height: 1.2; font-variant-numeric: tabular-nums; }
   .js-stat span { display: block; font-size: 12px; line-height: 1.35; color: var(--text-3); }
+  .js-stat b small { font-size: 13px; font-weight: 600; color: var(--text-3); margin-left: 6px; }
   .js-chart { margin: 20px 0 6px; overflow-x: auto; }
   .js-chart svg { display: block; min-width: 560px; width: 100%; height: auto; }
   .js-chart text { font: 12px var(--font-sans); fill: var(--text); }
@@ -140,19 +141,26 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
   function renderStats() {
     var list = shown();
     var count = function (f) { return list.filter(f).length; };
+    var total = list.length;
+    var cold = count(function (a) { return a.stages[0] === 'Applied'; });
+    // [count, label, show share of total]
     var stats = [
-      [count(function (a) { return a.stages[0] === 'Applied'; }), 'cold applications'],
-      [count(function (a) { return a.stages[0] !== 'Applied'; }), 'referrals or recruiter outreach'],
-      [count(function (a) { return a.outcome === 'Auto-rejected'; }), 'auto-rejected'],
-      [count(function (a) { return depth(a) >= 1; }), 'reached a screen'],
-      [count(function (a) { return depth(a) >= 3; }), 'reached interviews'],
-      [count(function (a) { return a.outcome === 'Ghosted'; }), 'ghosted']
+      [total, 'total (' + cold + ' cold, ' + (total - cold) + ' referral or outreach)', false],
+      [count(function (a) { return a.outcome === 'Pending'; }), 'still active', true],
+      [count(function (a) { return depth(a) >= 1; }), 'reached a screen', true],
+      [count(function (a) { return depth(a) >= 3; }), 'reached interviews', true],
+      [count(function (a) { return a.outcome === 'Auto-rejected'; }), 'auto-rejected', true],
+      [count(function (a) { return a.outcome === 'Ghosted'; }), 'ghosted', true]
     ];
     var el = document.getElementById('js-stats');
     el.innerHTML = '';
     stats.forEach(function (s) {
       var d = document.createElement('div'); d.className = 'js-stat';
       var b = document.createElement('b'); b.textContent = s[0];
+      if (s[2] && total) {
+        var pct = document.createElement('small'); pct.textContent = Math.round(100 * s[0] / total) + '%';
+        b.append(pct);
+      }
       var t = document.createElement('span'); t.textContent = s[1];
       d.append(b, t); el.append(d);
     });
