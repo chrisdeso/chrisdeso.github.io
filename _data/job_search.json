@@ -39,6 +39,18 @@
       "updated": "2026-10-16"
     },
     {
+      "company": "Charles Schwab",
+      "role": "Associate Software Engineer",
+      "lane": "SWE",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-10-17",
+      "updated": "2026-10-17"
+    },
+    {
       "company": "Boom",
       "role": "Director of Product Support",
       "lane": "Support",
