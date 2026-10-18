@@ -5,16 +5,37 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
 ---
 {% assign js = site.data.job_search %}
 <style>
-  :root { --js-wait: #a87f00; --js-data: #0b7285; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --js-wait: #e0bd4f; --js-data: #66d9e8; } }
-  :root[data-theme="dark"] { --js-wait: #e0bd4f; --js-data: #66d9e8; }
+  :root { --js-wait: #c79100; --js-no: #d6336c; --js-data: #0b7285; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --js-wait: #d9a93a; --js-no: #f06595; --js-data: #66d9e8; } }
+  :root[data-theme="dark"] { --js-wait: #d9a93a; --js-no: #f06595; --js-data: #66d9e8; }
   .js-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-2); margin: 4px 0 0; }
   .js-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
-  .js-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 10px; margin: 24px 0 8px; }
-  .js-stat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
-  .js-stat b { display: block; font-size: 24px; line-height: 1.2; font-variant-numeric: tabular-nums; }
-  .js-stat span { display: block; font-size: 12px; line-height: 1.35; color: var(--text-3); }
-  .js-stat b small { font-size: 13px; font-weight: 600; color: var(--text-3); margin-left: 6px; }
+  .js-stats { display: grid; grid-template-columns: minmax(150px, 200px) 1fr; gap: 20px 32px; margin: 24px 0 8px;
+              background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; }
+  .js-stats h3 { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; margin: 0 0 8px; }
+  .js-hero b { display: block; font-size: 56px; font-weight: 650; line-height: 1; letter-spacing: -.02em; }
+  .js-hero > span { display: block; font-size: 14px; color: var(--text-2); margin-top: 4px; }
+  .js-hero ul { list-style: none; padding: 0; margin: 14px 0 0; font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .js-hero ul b { display: inline; font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0; }
+  .js-hero .js-wait-note { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 12px; color: var(--text-3); line-height: 1.45; }
+  .js-hero .js-wait-note strong { color: var(--text); font-weight: 600; }
+  .js-right { display: grid; gap: 22px; min-width: 0; }
+  .js-bar { display: flex; gap: 2px; height: 18px; border-radius: 5px; overflow: hidden; }
+  .js-bar i { display: block; min-width: 6px; cursor: default; transition: opacity .15s; }
+  .js-bar:hover i { opacity: .45; }
+  .js-bar i:hover { opacity: 1; }
+  .js-bar i.hatch { background-image: repeating-linear-gradient(45deg, transparent 0 3px, rgba(255,255,255,.38) 3px 5px); }
+  .js-key { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--text-2); }
+  .js-key i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .js-key b { color: var(--text); font-weight: 600; margin-left: 4px; }
+  .js-key small { color: var(--text-3); margin-left: 4px; font-size: 12px; }
+  .js-funnel { display: grid; grid-template-columns: max-content 1fr max-content; gap: 7px 12px; align-items: center; font-size: 13px; }
+  .js-funnel .lbl { color: var(--text-2); }
+  .js-funnel .track { height: 10px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; }
+  .js-funnel .fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+  .js-funnel .val { font-variant-numeric: tabular-nums; text-align: right; color: var(--text); font-weight: 600; }
+  .js-funnel .val small { color: var(--text-3); font-weight: 400; margin-left: 6px; display: inline-block; min-width: 3.2em; }
+  @media (max-width: 620px) { .js-stats { grid-template-columns: 1fr; padding: 16px; } .js-hero b { font-size: 48px; } }
   .js-chart { margin: 20px 0 6px; overflow-x: auto; }
   .js-chart svg { display: block; min-width: 560px; width: 100%; height: auto; }
   .js-chart text { font: 12px var(--font-sans); fill: var(--text); }
@@ -37,7 +58,7 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
   .js-chip { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
   .js-chip.waiting { color: var(--js-wait); }
   .js-chip.moving { color: var(--st-active); }
-  .js-chip.rejected { color: var(--mod); }
+  .js-chip.rejected { color: var(--js-no); }
   .js-chip.ghosted { color: var(--st-archived); }
   @media (max-width: 520px) {
     .js-table .lane, .js-table th.lane { display: none; }
@@ -124,7 +145,7 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
   }
 
   function nodeColor(name) {
-    if (name === 'Auto-rejected' || name === 'Rejected') return css('--mod');
+    if (name === 'Auto-rejected' || name === 'Rejected') return css('--js-no');
     if (name === 'Ghosted' || name === 'Withdrew' || name === 'Declined') return css('--text-3');
     if (name === 'Awaiting reply' || name === 'In process') return css('--js-wait');
     return css('--accent');
@@ -138,32 +159,89 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
 
   function shown() { return apps.filter(function (a) { return lane === 'all' || a.lane === lane; }); }
 
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function pct(n, total) { return total ? Math.round(100 * n / total) + '%' : '–'; }
+
+  // Status buckets for the outcome bar, in display order: live first, closed after.
+  var BUCKETS = [
+    { key: 'moving', label: 'In process', color: '--accent', test: function (a) { return a.outcome === 'Pending' && depth(a) >= 1 || a.outcome === 'Accepted'; } },
+    { key: 'waiting', label: 'Awaiting reply', color: '--js-wait', test: function (a) { return a.outcome === 'Pending' && depth(a) === 0; } },
+    { key: 'rejected', label: 'Rejected', color: '--js-no', test: function (a) { return a.outcome === 'Rejected'; } },
+    { key: 'auto', label: 'Auto-rejected', color: '--js-no', hatch: true, test: function (a) { return a.outcome === 'Auto-rejected'; } },
+    { key: 'gone', label: 'Ghosted / withdrew', color: '--text-3', test: function (a) { return ['Ghosted', 'Withdrawn', 'Declined'].indexOf(a.outcome) >= 0; } }
+  ];
+
   function renderStats() {
-    var list = shown();
+    var list = shown(), total = list.length;
     var count = function (f) { return list.filter(f).length; };
-    var total = list.length;
-    var cold = count(function (a) { return a.stages[0] === 'Applied'; });
-    // [count, label, show share of total]
-    var stats = [
-      [total, 'total (' + cold + ' cold, ' + (total - cold) + ' referral or outreach)', false],
-      [count(function (a) { return a.outcome === 'Pending'; }), 'still active', true],
-      [count(function (a) { return depth(a) >= 1; }), 'reached a screen', true],
-      [count(function (a) { return depth(a) >= 3; }), 'reached interviews', true],
-      [count(function (a) { return a.outcome === 'Auto-rejected'; }), 'auto-rejected', true],
-      [count(function (a) { return a.outcome === 'Ghosted'; }), 'ghosted', true]
-    ];
-    var el = document.getElementById('js-stats');
-    el.innerHTML = '';
-    stats.forEach(function (s) {
-      var d = document.createElement('div'); d.className = 'js-stat';
-      var b = document.createElement('b'); b.textContent = s[0];
-      if (s[2] && total) {
-        var pct = document.createElement('small'); pct.textContent = Math.round(100 * s[0] / total) + '%';
-        b.append(pct);
-      }
-      var t = document.createElement('span'); t.textContent = s[1];
-      d.append(b, t); el.append(d);
+    var box = document.getElementById('js-stats');
+    box.innerHTML = '';
+
+    // Hero: the total, how each one started, and the longest open silence.
+    var hero = el('div', 'js-hero');
+    hero.append(el('b', null, total), el('span', null, total === 1 ? 'application' : 'applications'));
+    var entries = el('ul');
+    [['Applied', 'cold application', 'cold applications'], ['Referral', 'referral', 'referrals'], ['Recruiter outreach', 'recruiter outreach', 'recruiter outreach']].forEach(function (e) {
+      var n = count(function (a) { return a.stages[0] === e[0]; });
+      if (!n) return;
+      var li = el('li'); li.append(el('b', null, n), ' ' + (n === 1 ? e[1] : e[2])); entries.append(li);
     });
+    hero.append(entries);
+    var open = list.filter(function (a) { return a.outcome === 'Pending' && quietDays(a) != null; })
+      .sort(function (a, b) { return quietDays(b) - quietDays(a); });
+    if (open.length) {
+      var note = el('div', 'js-wait-note');
+      note.append('Longest open silence: ', el('strong', null, open[0].company), ', ' + quietDays(open[0]) + ' days');
+      hero.append(note);
+    }
+
+    var right = el('div', 'js-right');
+
+    // Outcome bar: one segment per application bucket, widths are shares of the total.
+    var outcome = el('div');
+    outcome.append(el('h3', null, 'Where they stand'));
+    var bar = el('div', 'js-bar'), key = el('ul', 'js-key');
+    bar.setAttribute('role', 'img');
+    var parts = [];
+    BUCKETS.forEach(function (bk) {
+      var members = list.filter(bk.test);
+      if (!members.length) return;
+      parts.push(bk.label + ' ' + members.length);
+      var seg = el('i', bk.hatch ? 'hatch' : null);
+      seg.style.flex = members.length;
+      seg.style.backgroundColor = 'var(' + bk.color + ')';
+      seg.addEventListener('mousemove', function (e) { showBucketTip(e, bk.label, members, total); });
+      seg.addEventListener('mouseleave', hideTip);
+      bar.append(seg);
+      var li = el('li'), sw = el('i', bk.hatch ? 'hatch' : null);
+      sw.style.backgroundColor = 'var(' + bk.color + ')';
+      li.append(sw, bk.label, el('b', null, members.length), el('small', null, pct(members.length, total)));
+      key.append(li);
+    });
+    bar.setAttribute('aria-label', parts.join(', '));
+    outcome.append(bar, key);
+
+    // Funnel: how many made it at least this far.
+    var funnel = el('div');
+    funnel.append(el('h3', null, 'How far they got'));
+    var grid = el('div', 'js-funnel');
+    [['Sent', 0], ['Reached a screen', 1], ['Reached interviews', 3], ['Final round', 5], ['Offer', 6]].forEach(function (f) {
+      var n = count(function (a) { return depth(a) >= f[1]; });
+      var track = el('div', 'track'), fill = el('div', 'fill');
+      fill.style.width = total ? (100 * n / total) + '%' : '0';
+      track.append(fill);
+      var val = el('div', 'val', n); val.append(el('small', null, pct(n, total)));
+      grid.append(el('div', 'lbl', f[0]), track, val);
+    });
+    funnel.append(grid);
+
+    right.append(outcome, funnel);
+    box.append(hero, right);
   }
 
   var tip = document.getElementById('js-tip');
@@ -176,6 +254,15 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
     var st = document.createElement('small');
     st.textContent = terminal(a).chip + (a.outcome === 'Pending' && q != null ? ' · ' + q + ' days since last contact' : '');
     tip.append(strong, role, route, st);
+    tip.hidden = false;
+    var x = Math.min(evt.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = x + 'px'; tip.style.top = (evt.clientY + 14) + 'px';
+  }
+  function showBucketTip(evt, title, members, total) {
+    tip.innerHTML = '';
+    tip.append(el('strong', null, title + ' · ' + members.length + ' of ' + total));
+    members.slice(0, 8).forEach(function (a) { tip.append(el('small', null, a.company + ' — ' + a.role)); });
+    if (members.length > 8) tip.append(el('small', null, '+' + (members.length - 8) + ' more'));
     tip.hidden = false;
     var x = Math.min(evt.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
     tip.style.left = x + 'px'; tip.style.top = (evt.clientY + 14) + 'px';
