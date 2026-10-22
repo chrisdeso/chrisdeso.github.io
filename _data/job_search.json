@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-20",
+  "generated": "2026-10-21",
   "ghost_days": 30,
   "applications": [
     {
@@ -100,6 +100,18 @@
       "via": null,
       "applied": "2026-10-17",
       "updated": "2026-10-17"
+    },
+    {
+      "company": "Brivo",
+      "role": "Software Engineer (New Grad)",
+      "lane": "SWE",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-10-21",
+      "updated": "2026-10-21"
     }
   ]
 }
