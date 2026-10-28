@@ -3,6 +3,18 @@
   "ghost_days": 30,
   "applications": [
     {
+      "company": "Anthropic",
+      "role": "Support Engineer",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Auto-rejected",
+      "via": "email",
+      "applied": null,
+      "updated": "2026-10-22"
+    },
+    {
       "company": "HackerRank",
       "role": "Customer Experience Engineer, L2",
       "lane": "Support",
