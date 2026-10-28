@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-23",
+  "generated": "2026-10-28",
   "ghost_days": 30,
   "applications": [
     {
@@ -124,6 +124,18 @@
       "via": null,
       "applied": "2026-10-23",
       "updated": "2026-10-23"
+    },
+    {
+      "company": "Realtor.com",
+      "role": "Associate Software Engineer (Owners & Sellers)",
+      "lane": "SWE",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-10-28",
+      "updated": "2026-10-28"
     }
   ]
 }
