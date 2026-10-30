@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-28",
+  "generated": "2026-10-29",
   "ghost_days": 30,
   "applications": [
     {
@@ -148,6 +148,18 @@
       "via": null,
       "applied": "2026-10-28",
       "updated": "2026-10-28"
+    },
+    {
+      "company": "Sanity",
+      "role": "Senior Support Engineer, NORAM",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-10-29",
+      "updated": "2026-10-29"
     }
   ]
 }
