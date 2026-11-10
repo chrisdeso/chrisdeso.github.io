@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-01",
+  "generated": "2026-11-10",
   "ghost_days": 30,
   "applications": [
     {
@@ -160,6 +160,18 @@
       "via": null,
       "applied": "2026-10-29",
       "updated": "2026-10-29"
+    },
+    {
+      "company": "Planview",
+      "role": "Software Engineer I (Portfolios)",
+      "lane": "SWE",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-10",
+      "updated": "2026-11-09"
     }
   ]
 }
