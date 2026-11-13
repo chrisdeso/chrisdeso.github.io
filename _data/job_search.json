@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-10",
+  "generated": "2026-11-12",
   "ghost_days": 30,
   "applications": [
     {
@@ -112,6 +112,20 @@
       "via": null,
       "applied": "2026-10-17",
       "updated": "2026-10-17"
+    },
+    {
+      "company": "ePayPolicy",
+      "role": "Integrations Specialist - Level II",
+      "lane": "Support",
+      "stages": [
+        "Applied",
+        "Recruiter screen",
+        "Hiring manager screen"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-12",
+      "updated": "2026-11-12"
     },
     {
       "company": "Brivo",
