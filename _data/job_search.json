@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-12",
+  "generated": "2026-11-14",
   "ghost_days": 30,
   "applications": [
     {
@@ -186,6 +186,18 @@
       "via": null,
       "applied": "2026-11-10",
       "updated": "2026-11-09"
+    },
+    {
+      "company": "LiteLLM",
+      "role": "Forward Deployed Engineer (New Grad)",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-14",
+      "updated": "2026-11-14"
     }
   ]
 }
