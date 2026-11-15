@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-01",
+  "generated": "2026-11-14",
   "ghost_days": 30,
   "applications": [
     {
@@ -39,6 +39,18 @@
       "updated": "2026-10-20"
     },
     {
+      "company": "Stripe",
+      "role": "Product Support - Bridge",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-10",
+      "updated": "2026-11-10"
+    },
+    {
       "company": "Agave",
       "role": "Technical Support Engineer",
       "lane": "Support",
@@ -61,18 +73,6 @@
       "via": "email",
       "applied": null,
       "updated": "2026-10-16"
-    },
-    {
-      "company": "Charles Schwab",
-      "role": "Associate Software Engineer",
-      "lane": "SWE",
-      "stages": [
-        "Applied"
-      ],
-      "outcome": "Pending",
-      "via": null,
-      "applied": "2026-10-17",
-      "updated": "2026-10-17"
     },
     {
       "company": "Boom",
@@ -99,7 +99,7 @@
       "outcome": "Ghosted",
       "via": null,
       "applied": null,
-      "updated": "2026-10-06"
+      "updated": "2026-10-07"
     },
     {
       "company": "Zello",
@@ -108,10 +108,24 @@
       "stages": [
         "Applied"
       ],
+      "outcome": "Auto-rejected",
+      "via": "email",
+      "applied": "2026-10-17",
+      "updated": "2026-11-02"
+    },
+    {
+      "company": "ePayPolicy",
+      "role": "Integrations Specialist - Level II",
+      "lane": "Support",
+      "stages": [
+        "Applied",
+        "Recruiter screen",
+        "Hiring manager screen"
+      ],
       "outcome": "Pending",
       "via": null,
-      "applied": "2026-10-17",
-      "updated": "2026-10-17"
+      "applied": "2026-10-20",
+      "updated": "2026-11-13"
     },
     {
       "company": "Brivo",
@@ -132,10 +146,10 @@
       "stages": [
         "Applied"
       ],
-      "outcome": "Pending",
-      "via": null,
+      "outcome": "Auto-rejected",
+      "via": "email",
       "applied": "2026-10-23",
-      "updated": "2026-10-23"
+      "updated": "2026-11-05"
     },
     {
       "company": "Realtor.com",
@@ -144,10 +158,10 @@
       "stages": [
         "Applied"
       ],
-      "outcome": "Pending",
-      "via": null,
+      "outcome": "Auto-rejected",
+      "via": "email",
       "applied": "2026-10-28",
-      "updated": "2026-10-28"
+      "updated": "2026-11-13"
     },
     {
       "company": "Sanity",
@@ -156,10 +170,82 @@
       "stages": [
         "Applied"
       ],
+      "outcome": "Auto-rejected",
+      "via": "email",
+      "applied": "2026-10-29",
+      "updated": "2026-11-06"
+    },
+    {
+      "company": "BodySpec",
+      "role": "Junior Software Engineer",
+      "lane": "SWE",
+      "stages": [
+        "Applied"
+      ],
       "outcome": "Pending",
       "via": null,
-      "applied": "2026-10-29",
-      "updated": "2026-10-29"
+      "applied": "2026-11-06",
+      "updated": "2026-11-06"
+    },
+    {
+      "company": "OpenRouter",
+      "role": "AI Provider Operations & Support Engineer",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-06",
+      "updated": "2026-11-06"
+    },
+    {
+      "company": "Planview",
+      "role": "Software Engineer I (Portfolios)",
+      "lane": "SWE",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-10",
+      "updated": "2026-11-09"
+    },
+    {
+      "company": "LiteLLM",
+      "role": "Forward Deployed Engineer (New Grad)",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-14",
+      "updated": "2026-11-14"
+    },
+    {
+      "company": "Salesforce",
+      "role": "Software Engineering AMTS (College Grad)",
+      "lane": "SWE",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Ghosted",
+      "via": null,
+      "applied": "2026-10-11",
+      "updated": "2026-10-11"
+    },
+    {
+      "company": "Agave",
+      "role": "Technical Support Engineer (re-applied)",
+      "lane": "Support",
+      "stages": [
+        "Applied"
+      ],
+      "outcome": "Pending",
+      "via": null,
+      "applied": "2026-11-05",
+      "updated": "2026-11-05"
     }
   ]
 }
