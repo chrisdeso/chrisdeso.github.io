@@ -126,7 +126,7 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
     switch (a.outcome) {
       case 'Auto-rejected': return { node: 'Auto-rejected', chip: 'Auto-rejected', cls: 'rejected' };
       case 'Rejected': return { node: 'Rejected', chip: 'Rejected' + (a.via ? ' via ' + a.via : ''), cls: 'rejected' };
-      case 'Ghosted': return { node: 'Ghosted', chip: 'Ghosted', cls: 'ghosted' };
+      case 'Ghosted': return { node: 'Ghosted 👻', chip: 'Ghosted 👻', cls: 'ghosted' };
       case 'Withdrawn': return { node: 'Withdrew', chip: 'Withdrew', cls: 'ghosted' };
       case 'Accepted': return { node: 'Accepted', chip: 'Accepted', cls: 'moving' };
       case 'Declined': return { node: 'Declined', chip: 'Declined offer', cls: 'ghosted' };
@@ -145,7 +145,7 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
 
   function nodeColor(name) {
     if (name === 'Auto-rejected' || name === 'Rejected') return css('--js-no');
-    if (name === 'Ghosted' || name === 'Withdrew' || name === 'Declined') return css('--text-3');
+    if (name === 'Ghosted 👻' || name === 'Withdrew' || name === 'Declined') return css('--text-3');
     if (name === 'Awaiting reply' || name === 'In process') return css('--js-wait');
     return css('--accent');
   }
@@ -153,7 +153,7 @@ description: Where my 2026+ job search stands, from application to outcome. Upda
   // Vertical order within a column: furthest progress on top, dead ends at the bottom.
   var ORDER = ['Offer', 'Accepted', 'Final round', 'Panel / final round',
                'Technical', 'Technical interview', 'Assessment', 'Screening', 'Hiring manager screen', 'Recruiter screen',
-               'Referred', 'Recruiter reached out', 'Applied', 'In process', 'Awaiting reply', 'Declined', 'Withdrew', 'Rejected', 'Auto-rejected', 'Ghosted'];
+               'Referred', 'Recruiter reached out', 'Applied', 'In process', 'Awaiting reply', 'Declined', 'Withdrew', 'Rejected', 'Auto-rejected', 'Ghosted 👻'];
   function rank(name) { var i = ORDER.indexOf(name); return i < 0 ? 99 : i; }
 
   function shown() { return apps.filter(function (a) { return lane === 'all' || a.lane === lane; }); }

@@ -82,7 +82,7 @@
         "Recruiter outreach",
         "Recruiter screen"
       ],
-      "outcome": "Ghosted 👻",
+      "outcome": "Ghosted",
       "via": null,
       "applied": null,
       "updated": "2026-10-03"
@@ -96,7 +96,7 @@
         "Recruiter screen",
         "Panel / final round"
       ],
-      "outcome": "Ghosted 👻",
+      "outcome": "Ghosted",
       "via": null,
       "applied": null,
       "updated": "2026-10-07"
@@ -230,7 +230,7 @@
       "stages": [
         "Applied"
       ],
-      "outcome": "Applied",
+      "outcome": "Pending",
       "via": null,
       "applied": "2026-10-11",
       "updated": "2026-10-11"
